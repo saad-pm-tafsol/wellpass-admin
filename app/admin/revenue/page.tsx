@@ -29,9 +29,8 @@ const RECORDS: RevenueRecord[] = [
 ].sort((a, b) => (a.date < b.date ? 1 : -1));
 
 export default function AdminRevenue() {
-  const bookingCredit = REVENUE_MONTHLY.reduce((s, m) => s + m.credit, 0);
   const bookingIndependent = REVENUE_MONTHLY.reduce((s, m) => s + m.independent, 0);
-  const bookingTotal = bookingCredit + bookingIndependent;
+  const bookingTotal = bookingIndependent;
   const membershipTotal = REVENUE_MONTHLY.reduce((s, m) => s + m.membership, 0);
   const totalRevenue = bookingTotal + membershipTotal;
   const pendingTotal = PAYOUTS.filter((p) => p.status === "Pending").reduce((s, p) => s + p.amount, 0);
@@ -64,7 +63,6 @@ export default function AdminRevenue() {
               <Tooltip />
               <Legend />
               <Bar dataKey="membership" name="Membership" stackId="a" fill="var(--color-chart-3)" />
-              <Bar dataKey="credit" name="Credit bookings" stackId="a" fill="var(--color-primary)" />
               <Bar dataKey="independent" name="Independent bookings" stackId="a" fill="var(--color-secondary)" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>

@@ -6,10 +6,10 @@ import { FileText, ShieldCheck, Save, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 
 const DEFAULTS = {
-  terms: `WellPass — Terms of Service
+  customerTerms: `WellPass — Customer Terms of Service
 
 1. Acceptance of Terms
-By creating an account or booking a class through WellPass, you agree to these Terms of Service.
+By creating an account or booking a class through WellPass, you agree to these Customer Terms of Service.
 
 2. Memberships & Credits
 Credits are valid for the duration stated on your plan and are non-transferable. Unused credits expire at the end of the billing period unless otherwise stated.
@@ -17,12 +17,12 @@ Credits are valid for the duration stated on your plan and are non-transferable.
 3. Bookings & Cancellations
 Bookings may be cancelled up to the studio's stated cancellation window. Late cancellations or no-shows may forfeit the credits used.
 
-4. Studio Partners
-Partner studios are responsible for the classes they list, including schedules, instructors and on-site safety.
+4. Customer Responsibilities
+Customers are responsible for providing accurate account details and for attending or cancelling bookings in a timely manner.
 
 5. Changes to These Terms
 WellPass may update these Terms from time to time. Continued use of the platform constitutes acceptance of the updated Terms.`,
-  privacy: `WellPass — Privacy Policy
+  customerPrivacy: `WellPass — Customer Privacy Policy
 
 1. Information We Collect
 We collect account details (name, email, phone), booking activity and payment information needed to operate the service.
@@ -38,17 +38,51 @@ We retain your data for as long as your account is active and as required by app
 
 5. Your Rights
 You may request access to, correction of, or deletion of your personal data by contacting support.`,
+  partnerTerms: `WellPass — Partner Terms of Service
+
+1. Partnership Agreement
+Partner studios agree to provide accurate class listings, schedules, instructor details and available capacity through WellPass.
+
+2. Booking & Payment Responsibilities
+Partners must honour confirmed bookings, maintain service quality and cooperate with payment reconciliation and payout processing.
+
+3. Cancellation & Service Standards
+Partners must manage no-shows, cancellations and customer disputes according to the agreed operating standards.
+
+4. Compliance
+Partner studios are responsible for maintaining required licenses, safety standards, and legal compliance on their premises.
+
+5. Termination
+WellPass may suspend or terminate a studio partnership if the studio repeatedly breaches platform rules or service expectations.`,
+  partnerPrivacy: `WellPass — Partner Privacy Policy
+
+1. Information We Collect
+We collect studio owner details, business information, booking and payout data, and operational information needed to manage the partnership.
+
+2. How We Use Your Data
+Your data is used to verify the studio, process bookings, manage payouts, and support platform operations.
+
+3. Sharing
+We share partner information with customers only where necessary to facilitate services, such as studio contact details and class information.
+
+4. Data Retention
+We retain partner data for as long as the partnership is active and as required by law or for dispute resolution.
+
+5. Your Rights
+You may request access to, correction of, or deletion of your business information by contacting support.`,
 };
 
-type DocKey = "terms" | "privacy";
+type DocKey = keyof typeof DEFAULTS;
 
 const TABS: { key: DocKey; label: string; icon: typeof FileText }[] = [
-  { key: "terms", label: "Terms of Service", icon: FileText },
-  { key: "privacy", label: "Privacy Policy", icon: ShieldCheck },
+  { key: "customerTerms", label: "Customer Terms", icon: FileText },
+  { key: "customerPrivacy", label: "Customer Privacy", icon: ShieldCheck },
+  { key: "partnerTerms", label: "Partner Terms", icon: FileText },
+  { key: "partnerPrivacy", label: "Partner Privacy", icon: ShieldCheck },
 ];
 
 export default function AdminTerms() {
-  const [active, setActive] = useState<DocKey>("terms");
+  const [active, setActive] = useState<DocKey>("customerTerms");
   const [docs, setDocs] = useState<Record<DocKey, string>>(DEFAULTS);
 
   const activeLabel = TABS.find((t) => t.key === active)!.label;
@@ -65,10 +99,10 @@ export default function AdminTerms() {
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-bold tracking-tight">Terms &amp; Policies</h2>
-        <p className="text-sm text-muted-foreground">Edit the legal documents shown on the public website.</p>
+        <p className="text-sm text-muted-foreground">Edit the customer and partner legal documents shown on the public website.</p>
       </div>
 
-      <div className="inline-flex rounded-lg border border-border p-0.5">
+      <div className="inline-flex flex-wrap rounded-lg border border-border p-0.5 gap-1">
         {TABS.map((t) => {
           const Icon = t.icon;
           return (

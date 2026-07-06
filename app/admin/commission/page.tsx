@@ -12,8 +12,17 @@ const FIRST_BOOKING_RATE = 50;
 
 // Seed a couple of studios with custom override rates (like the reference).
 const OVERRIDE_SEED: Record<string, number> = { ironcore: 15, flex: 10 };
+const INITIAL_OVERRIDE_SEED: Record<string, number> = { ironcore: 40, flex: 45 };
 
-type Row = { id: string; name: string; city: string; custom: number; override: boolean };
+type Row = {
+  id: string;
+  name: string;
+  city: string;
+  ongoingCustom: number;
+  ongoingOverride: boolean;
+  initialCustom: number;
+  initialOverride: boolean;
+};
 
 const cityOf = (location: string) => location.split(",").pop()?.trim() ?? location;
 
@@ -29,36 +38,51 @@ function KpiCard({ label, value, hint }: { label: string; value: React.ReactNode
 
 export default function AdminCommission() {
   const [defaultRate, setDefaultRate] = useState(DEFAULT_RATE);
+  const [defaultInitialRate, setDefaultInitialRate] = useState(FIRST_BOOKING_RATE);
   const [rows, setRows] = useState<Row[]>(() =>
     STUDIOS.map((s) => ({
       id: s.id,
       name: s.name,
       city: cityOf(s.location),
-      custom: OVERRIDE_SEED[s.id] ?? DEFAULT_RATE,
-      override: s.id in OVERRIDE_SEED,
+      ongoingCustom: OVERRIDE_SEED[s.id] ?? DEFAULT_RATE,
+      ongoingOverride: s.id in OVERRIDE_SEED,
+      initialCustom: INITIAL_OVERRIDE_SEED[s.id] ?? FIRST_BOOKING_RATE,
+      initialOverride: s.id in INITIAL_OVERRIDE_SEED,
     })),
   );
 
   const [editOpen, setEditOpen] = useState(false);
+  const [initialEditOpen, setInitialEditOpen] = useState(false);
   const [rateDraft, setRateDraft] = useState(defaultRate);
+  const [initialRateDraft, setInitialRateDraft] = useState(defaultInitialRate);
 
-  const effective = (r: Row) => (r.override ? r.custom : defaultRate);
-  const onCustom = rows.filter((r) => r.override).length;
+  const effective = (r: Row) => (r.ongoingOverride ? r.ongoingCustom : defaultRate);
+  const onCustom = rows.filter((r) => r.ongoingOverride || r.initialOverride).length;
   const avgRate = useMemo(
     () => (rows.length ? Math.round((rows.reduce((s, r) => s + effective(r), 0) / rows.length) * 10) / 10 : defaultRate),
     [rows, defaultRate],
   );
 
-  const setCustom = (id: string, custom: number) => setRows((prev) => prev.map((r) => (r.id === id ? { ...r, custom } : r)));
-  const toggleOverride = (id: string) => setRows((prev) => prev.map((r) => (r.id === id ? { ...r, override: !r.override } : r)));
+  const setOngoingCustom = (id: string, ongoingCustom: number) => setRows((prev) => prev.map((r) => (r.id === id ? { ...r, ongoingCustom } : r)));
+  const toggleOngoingOverride = (id: string) => setRows((prev) => prev.map((r) => (r.id === id ? { ...r, ongoingOverride: !r.ongoingOverride } : r)));
+  const setInitialCustom = (id: string, initialCustom: number) => setRows((prev) => prev.map((r) => (r.id === id ? { ...r, initialCustom } : r)));
+  const toggleInitialOverride = (id: string) => setRows((prev) => prev.map((r) => (r.id === id ? { ...r, initialOverride: !r.initialOverride, initialCustom: !r.initialOverride ? defaultInitialRate : r.initialCustom } : r)));
 
   const saveRow = (r: Row) => {
-    toast.success(r.override ? `${r.name} — custom rate ${r.custom}% saved` : `${r.name} — using default ${defaultRate}%`);
+    const parts = [
+      r.ongoingOverride ? `ongoing ${r.ongoingCustom}%` : `ongoing default ${defaultRate}%`,
+      r.initialOverride ? `initial ${r.initialCustom}%` : `initial default ${defaultInitialRate}%`,
+    ];
+    toast.success(`${r.name} — ${parts.join(" · ")} saved`);
   };
 
   const openEdit = () => {
     setRateDraft(defaultRate);
     setEditOpen(true);
+  };
+  const openInitialEdit = () => {
+    setInitialRateDraft(defaultInitialRate);
+    setInitialEditOpen(true);
   };
   const saveDefault = (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,6 +90,13 @@ export default function AdminCommission() {
     setDefaultRate(rateDraft);
     setEditOpen(false);
     toast.success(`Default commission set to ${rateDraft}%`);
+  };
+  const saveInitialDefault = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (initialRateDraft <= 0 || initialRateDraft > 100) return toast.error("Rate must be between 0 and 100");
+    setDefaultInitialRate(initialRateDraft);
+    setInitialEditOpen(false);
+    toast.success(`Default first booking commission set to ${initialRateDraft}%`);
   };
 
   return (
@@ -92,8 +123,9 @@ export default function AdminCommission() {
 
         <div className="bg-card border border-border rounded-xl p-6">
           <div className="text-xs uppercase tracking-wider text-muted-foreground font-medium">First booking commission</div>
-          <div className="mt-2 text-4xl font-bold">{FIRST_BOOKING_RATE}%</div>
-          <p className="mt-2 text-sm text-muted-foreground">Fixed one-time charge on every studio&apos;s first booking. Not configurable.</p>
+          <div className="mt-2 text-4xl font-bold">{defaultInitialRate}%</div>
+          <p className="mt-2 text-sm text-muted-foreground">Default initial commission for every studio. Each studio can override it independently.</p>
+          <button onClick={openInitialEdit} className="mt-4 rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-accent">Edit Rate</button>
         </div>
       </div>
 
@@ -105,9 +137,8 @@ export default function AdminCommission() {
               <tr>
                 <th className="text-left px-4 py-3">Studio</th>
                 <th className="text-left px-4 py-3">City</th>
-                <th className="text-left px-4 py-3">Default</th>
-                <th className="text-left px-4 py-3">Custom rate</th>
-                <th className="text-left px-4 py-3">Override</th>
+                <th className="text-left px-4 py-3">Ongoing commission</th>
+                <th className="text-left px-4 py-3">Initial commission</th>
                 <th className="text-left px-4 py-3"></th>
               </tr>
             </thead>
@@ -118,23 +149,45 @@ export default function AdminCommission() {
                     <Link href={`/admin/studios/${r.id}`} className="font-medium text-primary hover:text-secondary hover:underline">{r.name}</Link>
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">{r.city}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{defaultRate}%</td>
                   <td className="px-4 py-3">
-                    <div className="inline-flex items-center rounded-lg border border-input bg-background focus-within:ring-2 focus-within:ring-ring">
-                      <input
-                        type="number"
-                        min={0}
-                        max={100}
-                        value={r.custom}
-                        onChange={(e) => setCustom(r.id, Number(e.target.value))}
-                        disabled={!r.override}
-                        className="w-16 bg-transparent px-2 py-1.5 text-sm font-mono focus:outline-none disabled:opacity-50"
-                      />
-                      <span className="pr-2 text-xs text-muted-foreground">%</span>
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                      <div className="inline-flex items-center rounded-lg border border-input bg-background focus-within:ring-2 focus-within:ring-ring">
+                        <input
+                          type="number"
+                          min={0}
+                          max={100}
+                          value={r.ongoingCustom}
+                          onChange={(e) => setOngoingCustom(r.id, Number(e.target.value))}
+                          disabled={!r.ongoingOverride}
+                          className="w-16 bg-transparent px-2 py-1.5 text-sm font-mono focus:outline-none disabled:opacity-50"
+                        />
+                        <span className="pr-2 text-xs text-muted-foreground">%</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <Switch checked={r.ongoingOverride} onChange={() => toggleOngoingOverride(r.id)} ariaLabel={`Ongoing override for ${r.name}`} />
+                        <span>{r.ongoingOverride ? "Enabled" : "Default"}</span>
+                      </div>
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <Switch checked={r.override} onChange={() => toggleOverride(r.id)} ariaLabel={`Override for ${r.name}`} />
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                      <div className="inline-flex items-center rounded-lg border border-input bg-background focus-within:ring-2 focus-within:ring-ring">
+                        <input
+                          type="number"
+                          min={0}
+                          max={100}
+                          value={r.initialOverride ? r.initialCustom : defaultInitialRate}
+                          onChange={(e) => setInitialCustom(r.id, Number(e.target.value))}
+                          disabled={!r.initialOverride}
+                          className="w-16 bg-transparent px-2 py-1.5 text-sm font-mono focus:outline-none disabled:opacity-50"
+                        />
+                        <span className="pr-2 text-xs text-muted-foreground">%</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <Switch checked={r.initialOverride} onChange={() => toggleInitialOverride(r.id)} ariaLabel={`Initial override for ${r.name}`} />
+                        <span>{r.initialOverride ? "Enabled" : "Default"}</span>
+                      </div>
+                    </div>
                   </td>
                   <td className="px-4 py-3">
                     <button onClick={() => saveRow(r)} className="rounded-lg border border-border px-4 py-1.5 text-sm font-medium hover:bg-accent">Save</button>
@@ -168,6 +221,35 @@ export default function AdminCommission() {
               max={100}
               value={rateDraft}
               onChange={(e) => setRateDraft(Number(e.target.value))}
+              autoFocus
+              className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+          </label>
+        </form>
+      </Modal>
+
+      <Modal
+        open={initialEditOpen}
+        onClose={() => setInitialEditOpen(false)}
+        title="Edit default first booking commission"
+        description="Applied to all studios that don't have an initial override."
+        size="sm"
+        footer={
+          <>
+            <button type="button" onClick={() => setInitialEditOpen(false)} className="rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-accent">Cancel</button>
+            <button type="submit" form="initial-rate-form" className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-secondary">Save rate</button>
+          </>
+        }
+      >
+        <form id="initial-rate-form" onSubmit={saveInitialDefault}>
+          <label className="block text-sm">
+            <span className="font-medium">Default first booking commission (%)</span>
+            <input
+              type="number"
+              min={0}
+              max={100}
+              value={initialRateDraft}
+              onChange={(e) => setInitialRateDraft(Number(e.target.value))}
               autoFocus
               className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-ring"
             />

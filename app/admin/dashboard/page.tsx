@@ -1,26 +1,34 @@
 "use client";
 
 import { Kpi } from "@/components/wp/Kpi";
-import { STUDIOS, REVENUE_MONTHLY, PLATFORM_DAILY } from "@/data/mock";
+import { STUDIOS, REGISTRATION_TRENDS, REVENUE_WEEKLY, REVENUE_MONTHLY, REVENUE_YEARLY } from "@/data/mock";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from "recharts";
 import { AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useAccounts } from "@/store/accounts";
 
 export default function Dashboard() {
   const router = useRouter();
   const { pendingStudios } = useAccounts();
+  const [range, setRange] = useState<"weekly" | "monthly" | "yearly">("monthly");
   const pendingCount = pendingStudios.length;
-  // Combined revenue across all sources: class bookings (credit + independent)
-  // and membership package sales.
-  const totalRevenue = REVENUE_MONTHLY.reduce((s, m) => s + m.credit + m.independent + m.membership, 0);
+  const rangeOptions = [
+    { key: "weekly" as const, label: "Weekly", description: "4 weeks" },
+    { key: "monthly" as const, label: "Monthly", description: "12 months" },
+    { key: "yearly" as const, label: "Yearly", description: "5 years" },
+  ];
+  const activeRange = rangeOptions.find((option) => option.key === range) ?? rangeOptions[1];
+  const registrationData = REGISTRATION_TRENDS[range];
+  const revenueData = range === "weekly" ? REVENUE_WEEKLY : range === "monthly" ? REVENUE_MONTHLY : REVENUE_YEARLY;
+  const totalRevenue = revenueData.reduce((s, item) => s + ("membership" in item ? item.membership : 0) + ("independent" in item ? item.independent : 0), 0);
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         <Kpi label="Studios" value="8" hint="7 active · 1 pending" />
         <Kpi label="Customers" value="1,247" hint="892 members" />
         <Kpi label="Bookings (month)" value="347" hint="of 8,420 lifetime" />
-        <Kpi label="Revenue" value={`SAR ${(totalRevenue / 1000).toFixed(1)}k`} accent="success" hint="bookings + memberships" />
+        <Kpi label="Revenue" value={`SAR ${(totalRevenue / 1000).toFixed(1)}k`} accent="success" hint={`${activeRange.description} view`} />
         <Kpi label="Pending payouts" value="SAR 28.6k" accent="warning" />
         <Kpi label="Active members" value="892" hint="of 1,247" accent="primary" />
       </div>
@@ -34,14 +42,32 @@ export default function Dashboard() {
         <button onClick={() => router.push("/admin/studios?filter=pending")} className="text-xs font-medium px-3 py-1.5 rounded-md bg-warning text-warning-foreground hover:bg-warning/80">Review now</button>
       </div>
 
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h3 className="font-semibold">Performance overview</h3>
+          <p className="text-sm text-muted-foreground">Showing {activeRange.description}</p>
+        </div>
+        <div className="inline-flex rounded-lg border border-border bg-background p-1">
+          {rangeOptions.map((option) => (
+            <button
+              key={option.key}
+              onClick={() => setRange(option.key)}
+              className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${range === option.key ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="grid lg:grid-cols-2 gap-4">
         <div className="bg-card border border-border rounded-xl p-5">
-          <h3 className="font-semibold mb-3">New registrations (last 7 days)</h3>
+          <h3 className="font-semibold mb-3">New registrations</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={PLATFORM_DAILY}>
+              <LineChart data={registrationData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-                <XAxis dataKey="day" stroke="var(--color-muted-foreground)" fontSize={12} />
+                <XAxis dataKey="label" stroke="var(--color-muted-foreground)" fontSize={12} />
                 <YAxis stroke="var(--color-muted-foreground)" fontSize={12} />
                 <Tooltip />
                 <Legend />
@@ -52,17 +78,16 @@ export default function Dashboard() {
           </div>
         </div>
         <div className="bg-card border border-border rounded-xl p-5">
-          <h3 className="font-semibold mb-3">Monthly revenue by source</h3>
+          <h3 className="font-semibold mb-3">Revenue by source</h3>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={REVENUE_MONTHLY}>
+              <BarChart data={revenueData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-                <XAxis dataKey="month" stroke="var(--color-muted-foreground)" fontSize={12} />
+                <XAxis dataKey={range === "yearly" ? "year" : range === "monthly" ? "month" : "week"} stroke="var(--color-muted-foreground)" fontSize={12} />
                 <YAxis stroke="var(--color-muted-foreground)" fontSize={12} />
                 <Tooltip />
                 <Legend />
                 <Bar dataKey="membership" name="Membership" stackId="a" fill="var(--color-chart-3)" radius={[0, 0, 0, 0]} />
-                <Bar dataKey="credit" name="Credit bookings" stackId="a" fill="var(--color-primary)" radius={[0, 0, 0, 0]} />
                 <Bar dataKey="independent" name="Independent bookings" stackId="a" fill="var(--color-secondary)" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>

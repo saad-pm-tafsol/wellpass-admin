@@ -12,6 +12,10 @@ type AccountsState = {
   toggleStudio: (id: string) => AccountStatus;
   /** Toggle a customer's account status (keyed by email); returns the new status. */
   toggleCustomer: (email: string) => AccountStatus;
+  /** Whether a customer can earn loyalty points. */
+  customerEarning: Record<string, boolean>;
+  /** Toggle whether a customer can earn loyalty points; returns the new value. */
+  toggleCustomerEarning: (email: string) => boolean;
 
   /** Studios still awaiting approval. */
   pendingStudios: PendingStudio[];
@@ -32,6 +36,9 @@ export function AccountsProvider({ children }: { children: ReactNode }) {
   const [customerStatus, setCustomerStatus] = useState<Record<string, AccountStatus>>(() =>
     Object.fromEntries(CUSTOMERS.map((c) => [c.email, c.status as AccountStatus])),
   );
+  const [customerEarning, setCustomerEarning] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(CUSTOMERS.map((c) => [c.email, true])),
+  );
   const [pendingStudios, setPendingStudios] = useState<PendingStudio[]>(PENDING_STUDIOS);
 
   const toggleStudio = (id: string): AccountStatus => {
@@ -43,6 +50,12 @@ export function AccountsProvider({ children }: { children: ReactNode }) {
   const toggleCustomer = (email: string): AccountStatus => {
     const next: AccountStatus = (customerStatus[email] ?? "Active") === "Frozen" ? "Active" : "Frozen";
     setCustomerStatus((prev) => ({ ...prev, [email]: next }));
+    return next;
+  };
+
+  const toggleCustomerEarning = (email: string): boolean => {
+    const next = !(customerEarning[email] ?? true);
+    setCustomerEarning((prev) => ({ ...prev, [email]: next }));
     return next;
   };
 
@@ -59,8 +72,10 @@ export function AccountsProvider({ children }: { children: ReactNode }) {
       value={{
         studioStatus,
         customerStatus,
+        customerEarning,
         toggleStudio,
         toggleCustomer,
+        toggleCustomerEarning,
         pendingStudios,
         getPendingStudio,
         approveStudio: resolve,

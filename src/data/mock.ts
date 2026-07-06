@@ -175,6 +175,40 @@ export const CUSTOMERS = [
   { name: "Fatima Al-Dosari", email: "fatima@example.com", plan: "Active Pack", credits: 95, bookings: 9, points: 270, status: "Active" },
 ];
 
+export type LoyaltyHistoryEntry = {
+  id: string;
+  customerEmail: string;
+  points: number;
+  earnedAt: string;
+  source: "Class attendance" | "Referral" | "Membership bonus" | "Promotion";
+  reason: string;
+};
+
+export const LOYALTY_HISTORY: LoyaltyHistoryEntry[] = [
+  { id: "lh-1", customerEmail: "sara@example.com", points: 10, earnedAt: "2026-01-10", source: "Class attendance", reason: "Attended Morning Flow Yoga" },
+  { id: "lh-2", customerEmail: "sara@example.com", points: 20, earnedAt: "2026-01-20", source: "Referral", reason: "Friend joined using the referral code" },
+  { id: "lh-3", customerEmail: "sara@example.com", points: 15, earnedAt: "2026-06-15", source: "Membership bonus", reason: "Annual membership loyalty bonus" },
+  { id: "lh-4", customerEmail: "ahmed@example.com", points: 25, earnedAt: "2026-02-12", source: "Promotion", reason: "Weekend challenge reward" },
+  { id: "lh-5", customerEmail: "ahmed@example.com", points: 40, earnedAt: "2026-06-18", source: "Class attendance", reason: "Completed strength training streak" },
+  { id: "lh-6", customerEmail: "noura@example.com", points: 12, earnedAt: "2026-03-05", source: "Class attendance", reason: "Joined a guided meditation session" },
+  { id: "lh-7", customerEmail: "khalid@example.com", points: 8, earnedAt: "2026-05-20", source: "Promotion", reason: "App onboarding reward" },
+  { id: "lh-8", customerEmail: "fatima@example.com", points: 18, earnedAt: "2026-04-08", source: "Membership bonus", reason: "Loyalty reward for active plan" },
+];
+
+export function getLoyaltyExpiryDate(earnedAt: string) {
+  const [year, month, day] = earnedAt.split("-").map(Number);
+  const expiry = new Date(year, month - 1, day);
+  expiry.setMonth(expiry.getMonth() + 3);
+  return expiry;
+}
+
+export function getLoyaltyStatus(earnedAt: string) {
+  const expiry = getLoyaltyExpiryDate(earnedAt);
+  const today = new Date();
+  const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  return expiry < startOfToday ? "Expired" : "Active";
+}
+
 export function studioById(id: string) {
   return STUDIOS.find((s) => s.id === id);
 }
@@ -183,15 +217,38 @@ export function classById(id: string) {
 }
 
 export const REVENUE_WEEKLY = [
-  { week: "W1", revenue: 980 }, { week: "W2", revenue: 1220 }, { week: "W3", revenue: 1430 }, { week: "W4", revenue: 1190 },
+  { week: "W1", membership: 2400, independent: 1200 }, { week: "W2", membership: 2600, independent: 1400 },
+  { week: "W3", membership: 2800, independent: 1500 }, { week: "W4", membership: 3000, independent: 1600 },
 ];
-// Monthly revenue by source: `credit` + `independent` are class-booking revenue,
-// `membership` is revenue from membership package sales.
+// Monthly revenue by source: independent bookings + membership package sales.
 export const REVENUE_MONTHLY = [
-  { month: "Jan", credit: 4200, independent: 1800, membership: 2400 }, { month: "Feb", credit: 4600, independent: 2100, membership: 2700 },
-  { month: "Mar", credit: 5100, independent: 2400, membership: 3000 }, { month: "Apr", credit: 5800, independent: 2700, membership: 3400 },
-  { month: "May", credit: 6300, independent: 3100, membership: 3800 }, { month: "Jun", credit: 7100, independent: 3500, membership: 4200 },
+  { month: "Jan", membership: 2400, independent: 1800 }, { month: "Feb", membership: 2700, independent: 2100 },
+  { month: "Mar", membership: 3000, independent: 2400 }, { month: "Apr", membership: 3400, independent: 2700 },
+  { month: "May", membership: 3800, independent: 3100 }, { month: "Jun", membership: 4200, independent: 3500 },
+  { month: "Jul", membership: 4600, independent: 3900 }, { month: "Aug", membership: 5000, independent: 4300 },
+  { month: "Sep", membership: 5400, independent: 4700 }, { month: "Oct", membership: 5800, independent: 5100 },
+  { month: "Nov", membership: 6200, independent: 5500 }, { month: "Dec", membership: 6600, independent: 5900 },
 ];
+export const REVENUE_YEARLY = [
+  { year: "2021", membership: 28000, independent: 21000 }, { year: "2022", membership: 32000, independent: 24000 },
+  { year: "2023", membership: 36000, independent: 27000 }, { year: "2024", membership: 40000, independent: 30000 }, { year: "2025", membership: 44000, independent: 33000 },
+];
+export const REGISTRATION_TRENDS = {
+  weekly: [
+    { label: "W1", customers: 82, studios: 2 }, { label: "W2", customers: 94, studios: 3 },
+    { label: "W3", customers: 106, studios: 4 }, { label: "W4", customers: 118, studios: 5 },
+  ],
+  monthly: [
+    { label: "Jan", customers: 312, studios: 7 }, { label: "Feb", customers: 336, studios: 8 }, { label: "Mar", customers: 348, studios: 8 },
+    { label: "Apr", customers: 372, studios: 9 }, { label: "May", customers: 394, studios: 10 }, { label: "Jun", customers: 418, studios: 10 },
+    { label: "Jul", customers: 442, studios: 11 }, { label: "Aug", customers: 466, studios: 12 }, { label: "Sep", customers: 490, studios: 12 },
+    { label: "Oct", customers: 514, studios: 13 }, { label: "Nov", customers: 538, studios: 14 }, { label: "Dec", customers: 562, studios: 15 },
+  ],
+  yearly: [
+    { label: "2021", customers: 1820, studios: 32 }, { label: "2022", customers: 2140, studios: 38 },
+    { label: "2023", customers: 2470, studios: 44 }, { label: "2024", customers: 2810, studios: 51 }, { label: "2025", customers: 3160, studios: 58 },
+  ],
+};
 
 // Individual membership package purchases (transaction log).
 export type MembershipPurchase = {
