@@ -58,7 +58,7 @@ npm run lint    # eslint
 
 All 12 sidebar sections are live pages (data is mocked in `src/data/mock.ts`):
 
-Dashboard · Studios · Customers · Bookings · Membership Plans · Categories ·
+Dashboard · Partners · Customers · Bookings · Membership Plans · Categories ·
 Loyalty · Revenue · Analytics · Content · Settings · Notifications
 
 ## Project layout

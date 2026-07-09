@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import Link from "next/link";
 import { CUSTOMERS } from "@/data/mock";
 import { useAccounts } from "@/store/accounts";
@@ -14,12 +14,11 @@ export default function AdminCustomers() {
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("all");
 
-  const statusOf = (email: string, fallback: string) => customerStatus[email] ?? fallback;
+  const statusOf = useCallback((email: string, fallback: string) => customerStatus[email] ?? fallback, [customerStatus]);
 
   const total = CUSTOMERS.length;
   const active = CUSTOMERS.filter((c) => statusOf(c.email, c.status) === "Active").length;
   const frozen = CUSTOMERS.filter((c) => statusOf(c.email, c.status) === "Frozen").length;
-  const totalPoints = CUSTOMERS.reduce((sum, c) => sum + c.points, 0);
 
   const statuses = useMemo(() => Array.from(new Set(CUSTOMERS.map((c) => c.status))).sort(), []);
 
@@ -30,7 +29,7 @@ export default function AdminCustomers() {
       const matchesStatus = status === "all" || statusOf(c.email, c.status) === status;
       return matchesQuery && matchesStatus;
     });
-  }, [query, status, customerStatus]);
+  }, [query, status, statusOf]);
 
   const onToggle = (email: string, name: string) => {
     const next = toggleCustomer(email);
@@ -69,11 +68,10 @@ export default function AdminCustomers() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <Kpi label="Total customers" value={total.toLocaleString()} />
         <Kpi label="Active" value={active} accent="success" />
         <Kpi label="Frozen" value={frozen} accent="warning" />
-        <Kpi label="Loyalty points" value={totalPoints.toLocaleString()} accent="primary" />
       </div>
 
       <div className="bg-card border border-border rounded-xl overflow-x-auto">

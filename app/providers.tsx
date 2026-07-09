@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState, type ReactNode } from "react";
 import { Toaster } from "sonner";
 import { AccountsProvider } from "@/store/accounts";
+import { CreditConversionProvider } from "@/store/credit-conversion";
 
 export function Providers({ children }: { children: ReactNode }) {
   // Create the QueryClient once per browser session (lazy initial state) so it is
@@ -13,8 +14,10 @@ export function Providers({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <AccountsProvider>
-        {children}
-        <Toaster position="bottom-right" richColors closeButton />
+        <CreditConversionProvider>
+          {children}
+          <Toaster position="bottom-right" richColors closeButton />
+        </CreditConversionProvider>
       </AccountsProvider>
     </QueryClientProvider>
   );

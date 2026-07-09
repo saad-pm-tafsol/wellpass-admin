@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { BOOKINGS, classById, studioById, CLASSES } from "@/data/mock";
-import { creditsToSar } from "@/data/settings";
+import { useCreditConversion } from "@/store/credit-conversion";
 import { StatusBadge } from "@/components/wp/StatusBadge";
 import { Kpi } from "@/components/wp/Kpi";
 import { Modal } from "@/components/wp/Modal";
@@ -15,30 +15,31 @@ const STATS = {
   cancelled: BOOKINGS.filter((b) => b.status === "Cancelled").length,
 };
 
-// Pre-compute the derived row data once so filtering can search across joins.
-const ROWS = BOOKINGS.map((b, i) => {
-  const c = classById(b.classId) ?? CLASSES[0];
-  const s = studioById(c.studioId);
-  // Credit bookings convert to SAR via the admin-controlled rate; independent
-  // bookings use the studio's set price.
-  const sar = b.type === "Credit" ? creditsToSar(b.credits ?? 0) : (b.amount ?? 0);
-  const commission = i === 0 || i === 3 || i === 5 ? sar * 0.5 : 0;
-  return { booking: b, cls: c, className: c.name, studioName: s?.name ?? "", sar, commission };
-});
-
 export default function AdminBookings() {
+  const { convertCreditsToSar } = useCreditConversion();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("all");
   const [type, setType] = useState("all");
   const [selectedRef, setSelectedRef] = useState<string | null>(null);
 
   const statuses = useMemo(() => Array.from(new Set(BOOKINGS.map((b) => b.status))), []);
+  const rows = useMemo(
+    () =>
+      BOOKINGS.map((b, i) => {
+        const c = classById(b.classId) ?? CLASSES[0];
+        const s = studioById(c.studioId);
+        const sar = b.type === "Credit" ? convertCreditsToSar(b.credits ?? 0) : (b.amount ?? 0);
+        const commission = i === 0 || i === 3 || i === 5 ? sar * 0.5 : 0;
+        return { booking: b, cls: c, className: c.name, studioName: s?.name ?? "", sar, commission };
+      }),
+    [convertCreditsToSar],
+  );
 
-  const selected = ROWS.find((r) => r.booking.ref === selectedRef) ?? null;
+  const selected = rows.find((r) => r.booking.ref === selectedRef) ?? null;
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return ROWS.filter((r) => {
+    return rows.filter((r) => {
       const matchesQuery =
         !q ||
         r.booking.ref.toLowerCase().includes(q) ||
@@ -49,7 +50,7 @@ export default function AdminBookings() {
       const matchesType = type === "all" || r.booking.type === type;
       return matchesQuery && matchesStatus && matchesType;
     });
-  }, [query, status, type]);
+  }, [query, rows, status, type]);
 
   return (
     <div className="space-y-6">
@@ -68,7 +69,7 @@ export default function AdminBookings() {
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search ref, customer, studio..."
+              placeholder="Search ref, customer, partner..."
               className="rounded-lg border border-input bg-card pl-9 pr-3 py-2 text-sm w-60 focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
@@ -107,7 +108,7 @@ export default function AdminBookings() {
             <tr>
               <th className="text-left px-4 py-3">Ref</th>
               <th className="text-left px-4 py-3">Customer</th>
-              <th className="text-left px-4 py-3">Studio</th>
+              <th className="text-left px-4 py-3">Partner</th>
               <th className="text-left px-4 py-3">Class</th>
               <th className="text-left px-4 py-3">Type</th>
               <th className="text-left px-4 py-3">Amount</th>
@@ -156,7 +157,7 @@ export default function AdminBookings() {
             <div className="flex items-center gap-2"><StatusBadge status={selected.booking.status} /></div>
             <dl className="grid grid-cols-2 gap-4 text-sm">
               <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Customer</dt><dd className="mt-0.5 font-medium">{selected.booking.customer}</dd></div>
-              <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Studio</dt><dd className="mt-0.5">{selected.studioName}</dd></div>
+              <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Partner</dt><dd className="mt-0.5">{selected.studioName}</dd></div>
               <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Class</dt><dd className="mt-0.5">{selected.className}</dd></div>
               <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Instructor</dt><dd className="mt-0.5">{selected.cls.instructor}</dd></div>
               <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">When</dt><dd className="mt-0.5">{selected.cls.day} · {selected.cls.time} · {selected.cls.duration} min</dd></div>

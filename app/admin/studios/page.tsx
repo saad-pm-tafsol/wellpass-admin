@@ -57,9 +57,9 @@ export default function AdminStudios() {
     <div className="space-y-6">
       <div className="flex items-end justify-between gap-4 flex-wrap">
         <div>
-          <h2 className="text-xl font-bold tracking-tight">Studio management</h2>
+          <h2 className="text-xl font-bold tracking-tight">Partner management</h2>
           <p className="text-sm text-muted-foreground">
-            {filtered.length === STUDIOS.length ? `${STUDIOS.length} studios on the platform` : `${filtered.length} of ${STUDIOS.length} studios`}
+            {filtered.length === STUDIOS.length ? `${STUDIOS.length} partners on the platform` : `${filtered.length} of ${STUDIOS.length} partners`}
           </p>
         </div>
         <div className="flex gap-2 flex-wrap">
@@ -68,7 +68,7 @@ export default function AdminStudios() {
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search studios..."
+              placeholder="Search partners..."
               className="rounded-lg border border-input bg-card pl-9 pr-3 py-2 text-sm w-56 focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
@@ -88,7 +88,7 @@ export default function AdminStudios() {
       {latestPending && (
         <div className={`bg-warning/10 border rounded-xl p-5 transition-shadow ${highlightPending ? "border-warning ring-2 ring-warning/50" : "border-warning/30"}`}>
           <div className="font-semibold mb-3">
-            {pendingStudios.length} studio{pendingStudios.length > 1 ? "s" : ""} pending approval
+            {pendingStudios.length} partner{pendingStudios.length > 1 ? "s" : ""} pending approval
             <span className="ml-2 text-xs font-normal text-muted-foreground">· latest application</span>
           </div>
           <div className="flex items-center justify-between gap-3 flex-wrap rounded-lg border border-warning/20 bg-card/60 p-3">
@@ -111,7 +111,7 @@ export default function AdminStudios() {
           <table className="w-full text-sm">
             <thead className="bg-accent/50 text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
-                <th className="text-left px-4 py-3">Studio</th>
+                <th className="text-left px-4 py-3">Partner</th>
                 <th className="text-left px-4 py-3">Category</th>
                 <th className="text-left px-4 py-3">Location</th>
                 <th className="text-left px-4 py-3">Submitted</th>
@@ -145,7 +145,7 @@ export default function AdminStudios() {
         <table className="w-full text-sm">
           <thead className="bg-accent/50 text-xs uppercase tracking-wider text-muted-foreground">
             <tr>
-              <th className="text-left px-4 py-3">Studio</th>
+              <th className="text-left px-4 py-3">Partner</th>
               <th className="text-left px-4 py-3">Category</th>
               <th className="text-left px-4 py-3">Location</th>
               <th className="text-left px-4 py-3">Rating</th>
@@ -178,7 +178,7 @@ export default function AdminStudios() {
             })}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={7} className="px-4 py-10 text-center text-sm text-muted-foreground">No studios match your filters.</td>
+                <td colSpan={7} className="px-4 py-10 text-center text-sm text-muted-foreground">No partners match your filters.</td>
               </tr>
             )}
           </tbody>

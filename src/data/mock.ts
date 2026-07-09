@@ -28,34 +28,46 @@ export type Studio = {
   rating: number;
   reviews: number;
   members: number;
+  email: string;
+  phone: string;
+  owner: string;
   description: string;
   amenities: string[];
+  submittedAt: string;
   gradient: string;
 };
 
 export const STUDIOS: Studio[] = [
-  { id: "zenith", name: "Zenith Pilates Studio", category: "Pilates", location: "Al Olaya, Riyadh", rating: 4.8, reviews: 184, members: 320,
-    description: "Boutique reformer & mat Pilates studio with certified instructors and personalized programming.",
-    amenities: ["Showers", "Lockers", "Wi-Fi", "Parking"], gradient: "from-violet-500 to-fuchsia-600" },
+  { id: "zenith", name: "Zenith Pilates Partner", category: "Pilates", location: "Al Olaya, Riyadh", rating: 4.8, reviews: 184, members: 320,
+    email: "hello@zenithpilates.sa", phone: "+966 50 210 4488", owner: "Mariam Al-Fahad",
+    description: "Boutique reformer & mat Pilates partner with certified instructors and personalized programming.",
+    amenities: ["Showers", "Lockers", "Wi-Fi", "Parking"], submittedAt: "2025-05-12", gradient: "from-violet-500 to-fuchsia-600" },
   { id: "ironcore", name: "IronCore Gym", category: "Strength Training", location: "Al Malaz, Riyadh", rating: 4.5, reviews: 312, members: 510,
+    email: "ops@ironcore.sa", phone: "+966 55 310 9182", owner: "Hassan Al-Mutairi",
     description: "Heavy iron, real coaches. Programmed strength training with free weights and rigs.",
-    amenities: ["Showers", "Lockers", "Parking", "Changing Rooms"], gradient: "from-zinc-700 to-zinc-900" },
+    amenities: ["Showers", "Lockers", "Parking", "Changing Rooms"], submittedAt: "2025-04-18", gradient: "from-zinc-700 to-zinc-900" },
   { id: "serene", name: "Serene Yoga Collective", category: "Yoga", location: "Al Nakheel, Riyadh", rating: 4.9, reviews: 221, members: 280,
-    description: "Vinyasa, Hatha, Yin and restorative yoga in a calm sun-filled studio.",
-    amenities: ["Showers", "Lockers", "Wi-Fi", "Prayer Room"], gradient: "from-emerald-400 to-teal-600" },
+    email: "namaste@sereneyoga.sa", phone: "+966 54 882 7710", owner: "Layla Hassan",
+    description: "Vinyasa, Hatha, Yin and restorative yoga with a calm sun-filled partner.",
+    amenities: ["Showers", "Lockers", "Wi-Fi", "Prayer Room"], submittedAt: "2025-05-03", gradient: "from-emerald-400 to-teal-600" },
   { id: "aquafit", name: "AquaFit Center", category: "Swimming", location: "Al Wurud, Riyadh", rating: 4.6, reviews: 142, members: 190,
+    email: "booking@aquafit.sa", phone: "+966 56 440 2199", owner: "Tariq Al-Nasser",
     description: "Olympic lane pool with coached swim sessions and aqua fitness classes.",
-    amenities: ["Showers", "Lockers", "Parking", "Changing Rooms"], gradient: "from-sky-400 to-blue-700" },
+    amenities: ["Showers", "Lockers", "Parking", "Changing Rooms"], submittedAt: "2025-05-20", gradient: "from-sky-400 to-blue-700" },
   { id: "padel", name: "Padel Pro Arena", category: "Padel", location: "Al Muhammadiyah, Riyadh", rating: 4.7, reviews: 298, members: 440,
+    email: "play@padelpro.sa", phone: "+966 50 778 6504", owner: "Carlos Mendez", submittedAt: "2025-04-26",
     description: "Premium glass-walled padel courts, beginner to pro level coaching.",
     amenities: ["Showers", "Café", "Parking", "Pro Shop"], gradient: "from-lime-400 to-emerald-600" },
   { id: "flex", name: "FlexFusion Fitness", category: "CrossFit/HIIT", location: "Al Aqiq, Riyadh", rating: 4.4, reviews: 256, members: 360,
+    email: "team@flexfusion.sa", phone: "+966 53 102 7735", owner: "Omar Saeed", submittedAt: "2025-05-28",
     description: "High-intensity functional fitness — CrossFit, HIIT, boxing and conditioning.",
     amenities: ["Showers", "Lockers", "Parking"], gradient: "from-orange-500 to-rose-600" },
   { id: "mindbody", name: "Mind & Body Wellness", category: "Meditation", location: "Al Sulaimaniyah, Riyadh", rating: 4.9, reviews: 98, members: 150,
+    email: "care@mindbody.sa", phone: "+966 55 667 1820", owner: "Dr. Reem Al-Saud", submittedAt: "2025-06-02",
     description: "Mindfulness, meditation and breathwork in a tranquil environment.",
     amenities: ["Wi-Fi", "Prayer Room", "Café"], gradient: "from-indigo-400 to-purple-700" },
   { id: "squash", name: "Squash Republic", category: "Squash", location: "Al Rawdah, Riyadh", rating: 4.6, reviews: 167, members: 220,
+    email: "courts@squashrepublic.sa", phone: "+966 54 331 9076", owner: "Fahad Al-Qahtani", submittedAt: "2025-05-09",
     description: "Glass-back squash courts with professional coaching and league play.",
     amenities: ["Showers", "Lockers", "Café", "Parking"], gradient: "from-red-500 to-amber-600" },
 ];
@@ -80,7 +92,7 @@ export const PENDING_STUDIOS: PendingStudio[] = [
     amenities: ["Showers", "Lockers", "Parking", "Chalk Station"], submittedAt: "2025-06-28" },
   { id: "aercycle", name: "Aer Cycle Club", email: "join@aercycle.sa", phone: "+966 55 908 2211", owner: "Lina Al-Qahtani",
     category: "Cycling", location: "Al Hamra, Jeddah",
-    description: "High-energy indoor cycling studio with rhythm rides, live DJ sessions and performance tracking.",
+    description: "High-energy indoor cycling partner with rhythm rides, live DJ sessions and performance tracking.",
     amenities: ["Showers", "Lockers", "Wi-Fi", "Café"], submittedAt: "2025-06-29" },
   { id: "momentum", name: "Momentum CrossFit", email: "team@momentumcf.sa", phone: "+966 53 447 6690", owner: "Yousef Al-Ghamdi",
     category: "CrossFit/HIIT", location: "Al Aqiq, Riyadh",
@@ -88,15 +100,15 @@ export const PENDING_STUDIOS: PendingStudio[] = [
     amenities: ["Showers", "Lockers", "Parking"], submittedAt: "2025-06-30" },
   { id: "serenity", name: "Serenity Spa & Yoga", email: "hello@serenity.sa", phone: "+966 56 220 3388", owner: "Huda Al-Rashid",
     category: "Yoga", location: "Al Rakah, Al Khobar",
-    description: "Calm boutique studio offering Hatha, Yin and restorative yoga plus guided meditation.",
+    description: "Calm boutique partner offering Hatha, Yin and restorative yoga plus guided meditation.",
     amenities: ["Showers", "Wi-Fi", "Prayer Room", "Café"], submittedAt: "2025-07-01" },
 ];
 
-export type Plan = { id: string; name: string; credits: number; price: number; popular?: boolean };
+export type Plan = { id: string; name: string; credits: number; price: number; validityMonths: number; popular?: boolean };
 export const PLANS: Plan[] = [
-  { id: "starter", name: "Starter Pack", credits: 50, price: 149 },
-  { id: "active", name: "Active Pack", credits: 100, price: 249, popular: true },
-  { id: "elite", name: "Elite Pack", credits: 150, price: 349 },
+  { id: "starter", name: "Starter Pack", credits: 50, price: 149, validityMonths: 1 },
+  { id: "active", name: "Active Pack", credits: 100, price: 249, validityMonths: 2, popular: true },
+  { id: "elite", name: "Elite Pack", credits: 150, price: 349, validityMonths: 3 },
 ];
 
 export type ClassItem = {
@@ -127,7 +139,7 @@ export const CLASSES: ClassItem[] = [
   { id: "c10", name: "Boxing Fundamentals", studioId: "flex", instructor: "Coach Mike", day: "Tomorrow", time: "09:00", duration: 60, credits: 12, capacity: 15, booked: 7, category: "Boxing", gender: "Mixed" },
 ];
 
-export type BookingStatus = "Pending" | "Confirmed" | "Cancelled" | "Completed" | "Waitlisted" | "Rejected" | "No-Show";
+export type BookingStatus = "Pending" | "Confirmed" | "Cancelled" | "Completed" | "Rejected" | "No-Show";
 
 export type Booking = {
   ref: string;
@@ -150,7 +162,6 @@ export const BOOKINGS: Booking[] = [
   { ref: "WP-2025-04815", customer: "Ahmed Al-Rashidi", classId: "c3", status: "Completed", type: "Credit", credits: 10, createdAt: "2025-06-26 18:00" },
   { ref: "WP-2025-04814", customer: "Fatima Al-Dosari", classId: "c7", status: "Cancelled", type: "Credit", credits: 6, createdAt: "2025-06-25 08:00" },
   { ref: "WP-2025-04813", customer: "Khalid Al-Shehri", classId: "c4", status: "Rejected", type: "Independent", amount: 100, createdAt: "2025-06-25 11:20" },
-  { ref: "WP-2025-04812", customer: "Sara Al-Hamdan", classId: "c3", status: "Waitlisted", type: "Credit", credits: 10, createdAt: "2025-06-28 06:00" },
 ];
 
 export const CURRENT_CUSTOMER = {
@@ -168,11 +179,11 @@ export const CURRENT_CUSTOMER = {
 };
 
 export const CUSTOMERS = [
-  { name: "Sara Al-Hamdan", email: "sara@example.com", plan: "Active Pack", credits: 78, bookings: 12, points: 340, status: "Active" },
-  { name: "Ahmed Al-Rashidi", email: "ahmed@example.com", plan: "Elite Pack", credits: 132, bookings: 28, points: 890, status: "Active" },
-  { name: "Noura Al-Otaibi", email: "noura@example.com", plan: "Starter Pack", credits: 22, bookings: 5, points: 120, status: "Frozen" },
+  { name: "Sara Al-Hamdan", email: "sara@example.com", phone: "+966 50 884 2190", dateOfBirth: "1993-04-18", gender: "Female", nationality: "Saudi", city: "Riyadh", preferredLanguage: "English", joinedAt: "2025-01-12", referralCode: "SARA2025", marketingOptIn: true, plan: "Active Pack", credits: 78, bookings: 12, points: 340, status: "Active" },
+  { name: "Ahmed Al-Rashidi", email: "ahmed@example.com", phone: "+966 55 129 7740", dateOfBirth: "1988-11-03", gender: "Male", nationality: "Saudi", city: "Riyadh", preferredLanguage: "Arabic", joinedAt: "2024-12-04", referralCode: "AHMED2025", marketingOptIn: true, plan: "Elite Pack", credits: 132, bookings: 28, points: 890, status: "Active" },
+  { name: "Noura Al-Otaibi", email: "noura@example.com", phone: "+966 56 440 1182", dateOfBirth: "1997-07-26", gender: "Female", nationality: "Saudi", city: "Jeddah", preferredLanguage: "Arabic", joinedAt: "2025-03-19", referralCode: "NOURA2025", marketingOptIn: false, plan: "Starter Pack", credits: 22, bookings: 5, points: 120, status: "Frozen" },
   { name: "Khalid Al-Shehri", email: "khalid@example.com", plan: "—", credits: 0, bookings: 3, points: 60, status: "Active" },
-  { name: "Fatima Al-Dosari", email: "fatima@example.com", plan: "Active Pack", credits: 95, bookings: 9, points: 270, status: "Active" },
+  { name: "Fatima Al-Dosari", email: "fatima@example.com", phone: "+966 53 226 5801", dateOfBirth: "1995-09-09", gender: "Female", nationality: "Saudi", city: "Al Khobar", preferredLanguage: "Arabic", joinedAt: "2025-02-22", referralCode: "FATIMA2025", marketingOptIn: true, plan: "Active Pack", credits: 95, bookings: 9, points: 270, status: "Active" },
 ];
 
 export type LoyaltyHistoryEntry = {
@@ -277,10 +288,9 @@ export const PLATFORM_DAILY = [
 
 export const NOTIFICATIONS = [
   { id: 1, type: "success", title: "Booking Confirmed", body: "Your Power Pilates Core class at Zenith Pilates is confirmed for tomorrow 10:00 AM. Reference: WP-2025-04821", time: "2h ago", unread: true },
-  { id: 2, type: "warning", title: "Waitlist Spot Available", body: "A spot opened in HIIT Blast at FlexFusion Fitness! You have 10 minutes to confirm.", time: "3h ago", unread: true },
   { id: 3, type: "error", title: "Booking Rejected", body: "Squash Republic has declined your booking for today 4:00 PM.", time: "5h ago", unread: false },
   { id: 4, type: "success", title: "Credits Refunded", body: "15 credits have been returned to your account. Booking: WP-2025-04760", time: "Yesterday", unread: false },
   { id: 5, type: "info", title: "Loyalty Points Earned", body: "You earned 10 points for attending Morning Flow Yoga! Total: 340 pts", time: "Yesterday", unread: false },
-  { id: 6, type: "info", title: "Referral Reward", body: "Your friend Ahmed joined using your code! You earned 25 bonus points.", time: "2 days ago", unread: false },
+  { id: 6, type: "info", title: "Referral Reward", body: "Your friend Ahmed joined using your code! You earned 75 bonus points.", time: "2 days ago", unread: false },
   { id: 7, type: "default", title: "Membership Renewal Reminder", body: "Your Active Pack renews in 7 days on Jul 31. SAR 249 will be charged.", time: "3 days ago", unread: false },
 ];

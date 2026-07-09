@@ -6,7 +6,7 @@ import { LayoutDashboard, Building2, Users, ClipboardList, Coins, ArrowLeftRight
 
 const nav = [
   { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/admin/studios", label: "Studios", icon: Building2 },
+  { to: "/admin/studios", label: "Partners", icon: Building2 },
   { to: "/admin/customers", label: "Customers", icon: Users },
   { to: "/admin/bookings", label: "Bookings", icon: ClipboardList },
   { to: "/admin/membership-plans", label: "Membership Plans", icon: Coins },
@@ -23,15 +23,15 @@ const nav = [
 
 const titles: Record<string, string> = {
   "/admin/dashboard": "Admin Dashboard",
-  "/admin/studios": "Studio Management",
+  "/admin/studios": "Partner Management",
   "/admin/customers": "Customer Management",
   "/admin/bookings": "Booking Administration",
   "/admin/membership-plans": "Membership Plans",
   "/admin/credit-rate": "Credit Conversion",
   "/admin/categories": "Categories",
-  "/admin/loyalty": "Loyalty & Rewards",
+  "/admin/loyalty": "Loyalty & Referral",
   "/admin/revenue": "Revenue",
-  "/admin/payouts": "Studio Payouts",
+  "/admin/payouts": "Partner Payouts",
   "/admin/commission": "Commission",
   "/admin/settings": "Platform Settings",
   "/admin/notifications": "Notifications",

@@ -113,7 +113,7 @@ export default function AdminLogin() {
         <div>
           <h2 className="text-4xl font-extrabold leading-tight">Run the platform with confidence.</h2>
           <p className="mt-4 text-white/80 max-w-md">
-            Studios, customers, bookings, revenue and loyalty — one console for the whole WellPass network.
+            Partners, customers, bookings, revenue and loyalty — one console for the whole WellPass network.
           </p>
         </div>
         <div className="text-xs text-white/60">© 2025 WellPass · Admin Console</div>

@@ -5,7 +5,6 @@ const styles: Record<string, string> = {
   Active: "bg-success/15 text-success-foreground border border-success/30",
   Approved: "bg-success/15 text-success-foreground border border-success/30",
   Pending: "bg-warning/15 text-warning-foreground border border-warning/30",
-  Waitlisted: "bg-warning/15 text-warning-foreground border border-warning/30",
   Rejected: "bg-destructive/15 text-destructive border border-destructive/30",
   Cancelled: "bg-destructive/15 text-destructive border border-destructive/30",
   Inactive: "bg-destructive/15 text-destructive border border-destructive/30",

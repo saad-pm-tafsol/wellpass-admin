@@ -8,6 +8,26 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAccounts } from "@/store/accounts";
 
+const partnerRevenueById: Record<string, number> = {
+  ironcore: 186500,
+  padel: 174200,
+  flex: 151800,
+  zenith: 139400,
+  serene: 122750,
+  squash: 98400,
+  aquafit: 86350,
+  mindbody: 64100,
+};
+
+const money = (amount: number) => `SAR ${amount.toLocaleString()}`;
+
+const topPartners = STUDIOS.map((partner) => ({
+  ...partner,
+  revenue: partnerRevenueById[partner.id] ?? 0,
+}))
+  .sort((a, b) => b.revenue - a.revenue)
+  .slice(0, 5);
+
 export default function Dashboard() {
   const router = useRouter();
   const { pendingStudios } = useAccounts();
@@ -25,18 +45,18 @@ export default function Dashboard() {
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-        <Kpi label="Studios" value="8" hint="7 active · 1 pending" />
+        <Kpi label="Partners" value="8" hint="7 active · 1 pending" />
         <Kpi label="Customers" value="1,247" hint="892 members" />
         <Kpi label="Bookings (month)" value="347" hint="of 8,420 lifetime" />
         <Kpi label="Revenue" value={`SAR ${(totalRevenue / 1000).toFixed(1)}k`} accent="success" hint={`${activeRange.description} view`} />
         <Kpi label="Pending payouts" value="SAR 28.6k" accent="warning" />
-        <Kpi label="Active members" value="892" hint="of 1,247" accent="primary" />
+        <Kpi label="Members" value="892" hint="of 1,247" accent="primary" />
       </div>
 
       <div className="bg-warning/10 border border-warning/30 rounded-xl p-4 flex items-center gap-3">
         <AlertCircle className="h-5 w-5 text-warning-foreground shrink-0" />
         <div className="flex-1 text-sm">
-          <span className="font-medium">{pendingCount} studio{pendingCount === 1 ? "" : "s"} awaiting approval</span>
+          <span className="font-medium">{pendingCount} partner{pendingCount === 1 ? "" : "s"} awaiting approval</span>
           <span className="text-muted-foreground"> · 7 quarterly payouts due</span>
         </div>
         <button onClick={() => router.push("/admin/studios?filter=pending")} className="text-xs font-medium px-3 py-1.5 rounded-md bg-warning text-warning-foreground hover:bg-warning/80">Review now</button>
@@ -72,7 +92,7 @@ export default function Dashboard() {
                 <Tooltip />
                 <Legend />
                 <Line type="monotone" dataKey="customers" stroke="var(--color-secondary)" strokeWidth={2} />
-                <Line type="monotone" dataKey="studios" stroke="var(--color-primary)" strokeWidth={2} />
+                <Line type="monotone" dataKey="studios" name="Partners" stroke="var(--color-primary)" strokeWidth={2} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -96,19 +116,26 @@ export default function Dashboard() {
       </div>
 
       <div className="bg-card border border-border rounded-xl p-5">
-        <h3 className="font-semibold mb-4">Top studios by revenue</h3>
+        <h3 className="font-semibold mb-4">Top partners by revenue</h3>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[760px] text-sm">
             <thead className="text-xs uppercase tracking-wider text-muted-foreground">
-              <tr><th className="text-left py-2">Studio</th><th className="text-left">Category</th><th className="text-left">Location</th><th className="text-left">Rating</th></tr>
+              <tr>
+                <th className="py-2 pr-4 text-left">Partner</th>
+                <th className="px-4 py-2 text-left">Category</th>
+                <th className="px-4 py-2 text-left">Location</th>
+                <th className="px-4 py-2 text-right">Revenue</th>
+                <th className="py-2 pl-4 text-left">Rating</th>
+              </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {STUDIOS.slice(0, 5).map((s) => (
+              {topPartners.map((s) => (
                 <tr key={s.id}>
-                  <td className="py-3 font-medium">{s.name}</td>
-                  <td className="text-muted-foreground">{s.category}</td>
-                  <td className="text-muted-foreground">{s.location}</td>
-                  <td className="font-mono">{s.rating}</td>
+                  <td className="py-3 pr-4 font-medium">{s.name}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{s.category}</td>
+                  <td className="px-4 py-3 text-muted-foreground">{s.location}</td>
+                  <td className="px-4 py-3 text-right font-mono whitespace-nowrap">{money(s.revenue)}</td>
+                  <td className="py-3 pl-4 font-mono whitespace-nowrap">{s.rating}</td>
                 </tr>
               ))}
             </tbody>

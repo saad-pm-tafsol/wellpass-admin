@@ -1,14 +1,14 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { PLANS, CUSTOMERS } from "@/data/mock";
+import { PLANS } from "@/data/mock";
 import { Kpi } from "@/components/wp/Kpi";
 import { Modal } from "@/components/wp/Modal";
 import { cn } from "@/lib/utils";
 import { Check, Plus } from "lucide-react";
 import { toast } from "sonner";
 
-type Plan = { id: string; name: string; credits: number; price: number; popular?: boolean };
+type Plan = { id: string; name: string; credits: number; price: number; validityMonths: number; popular?: boolean };
 
 export default function AdminMembershipPlans() {
   const [plans, setPlans] = useState<Plan[]>(PLANS);
@@ -19,16 +19,15 @@ export default function AdminMembershipPlans() {
   const [name, setName] = useState("");
   const [credits, setCredits] = useState<number>(0);
   const [price, setPrice] = useState<number>(0);
+  const [validityMonths, setValidityMonths] = useState<number>(1);
   const [popular, setPopular] = useState(false);
-
-  const subscribersByPlan = (planName: string) => CUSTOMERS.filter((c) => c.plan === planName).length;
-  const mrr = plans.reduce((sum, p) => sum + p.price * subscribersByPlan(p.name), 0);
 
   const openCreate = () => {
     setEditingId(null);
     setName("");
     setCredits(0);
     setPrice(0);
+    setValidityMonths(1);
     setPopular(false);
     setOpen(true);
   };
@@ -38,6 +37,7 @@ export default function AdminMembershipPlans() {
     setName(p.name);
     setCredits(p.credits);
     setPrice(p.price);
+    setValidityMonths(p.validityMonths);
     setPopular(Boolean(p.popular));
     setOpen(true);
   };
@@ -46,23 +46,22 @@ export default function AdminMembershipPlans() {
     e.preventDefault();
     const trimmed = name.trim();
     if (!trimmed) return toast.error("Plan name is required");
-    if (credits <= 0 || price <= 0) return toast.error("Credits and price must be greater than zero");
+    if (credits <= 0 || price <= 0 || validityMonths <= 0) return toast.error("Credits, price, and validity must be greater than zero");
 
     setPlans((prev) => {
-      // Only one plan can be flagged "most popular".
       const cleared = popular ? prev.map((p) => ({ ...p, popular: false })) : prev;
       if (editingId) {
-        return cleared.map((p) => (p.id === editingId ? { ...p, name: trimmed, credits, price, popular } : p));
+        return cleared.map((p) => (p.id === editingId ? { ...p, name: trimmed, credits, price, validityMonths, popular } : p));
       }
-      return [...cleared, { id: `p${nextId.current++}`, name: trimmed, credits, price, popular }];
+      return [...cleared, { id: `p${nextId.current++}`, name: trimmed, credits, price, validityMonths, popular }];
     });
-    toast.success(editingId ? `“${trimmed}” updated` : `“${trimmed}” created`);
+    toast.success(editingId ? `"${trimmed}" updated` : `"${trimmed}" created`);
     setOpen(false);
   };
 
   const archive = (p: Plan) => {
     setPlans((prev) => prev.filter((x) => x.id !== p.id));
-    toast.success(`“${p.name}” archived`);
+    toast.success(`"${p.name}" archived`);
   };
 
   return (
@@ -77,10 +76,8 @@ export default function AdminMembershipPlans() {
         </button>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Kpi label="Active plans" value={plans.length} />
-        <Kpi label="Subscribers" value={CUSTOMERS.filter((c) => c.plan !== "—").length} accent="primary" />
-        <Kpi label="Est. monthly revenue" value={`SAR ${(mrr / 1000).toFixed(1)}k`} accent="success" />
         <Kpi label="Avg. credits / pack" value={plans.length ? Math.round(plans.reduce((s, p) => s + p.credits, 0) / plans.length) : 0} />
       </div>
 
@@ -100,8 +97,7 @@ export default function AdminMembershipPlans() {
               <div className="mt-1 text-sm text-muted-foreground">{p.credits} credits</div>
               <ul className="mt-4 space-y-2 text-sm">
                 <li className="flex items-center gap-2"><Check className="h-4 w-4 text-success-foreground" /> {p.credits} booking credits</li>
-                <li className="flex items-center gap-2"><Check className="h-4 w-4 text-success-foreground" /> Valid for 1 month</li>
-                <li className="flex items-center gap-2"><Check className="h-4 w-4 text-success-foreground" /> {subscribersByPlan(p.name)} active subscribers</li>
+                <li className="flex items-center gap-2"><Check className="h-4 w-4 text-success-foreground" /> Valid for {p.validityMonths} {p.validityMonths === 1 ? "month" : "months"}</li>
               </ul>
               <div className="mt-5 flex gap-2">
                 <button onClick={() => openEdit(p)} className="flex-1 rounded-lg border border-border px-3 py-2 text-sm font-medium hover:bg-accent">Edit</button>
@@ -156,10 +152,20 @@ export default function AdminMembershipPlans() {
                 className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </label>
+            <label className="block text-sm col-span-2">
+              <span className="font-medium">Validity (months)</span>
+              <input
+                type="number"
+                min={1}
+                value={validityMonths}
+                onChange={(e) => setValidityMonths(Number(e.target.value))}
+                className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+            </label>
           </div>
           <label className="flex items-center gap-2 text-sm">
             <input type="checkbox" checked={popular} onChange={(e) => setPopular(e.target.checked)} className="h-4 w-4 rounded border-input accent-primary" />
-            <span className="font-medium">Mark as “Most popular”</span>
+            <span className="font-medium">Mark as Most popular</span>
           </label>
         </form>
       </Modal>

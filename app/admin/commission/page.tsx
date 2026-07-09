@@ -56,10 +56,12 @@ export default function AdminCommission() {
   const [rateDraft, setRateDraft] = useState(defaultRate);
   const [initialRateDraft, setInitialRateDraft] = useState(defaultInitialRate);
 
-  const effective = (r: Row) => (r.ongoingOverride ? r.ongoingCustom : defaultRate);
   const onCustom = rows.filter((r) => r.ongoingOverride || r.initialOverride).length;
   const avgRate = useMemo(
-    () => (rows.length ? Math.round((rows.reduce((s, r) => s + effective(r), 0) / rows.length) * 10) / 10 : defaultRate),
+    () =>
+      rows.length
+        ? Math.round((rows.reduce((sum, r) => sum + (r.ongoingOverride ? r.ongoingCustom : defaultRate), 0) / rows.length) * 10) / 10
+        : defaultRate,
     [rows, defaultRate],
   );
 
@@ -103,7 +105,7 @@ export default function AdminCommission() {
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-bold tracking-tight">Commission</h2>
-        <p className="text-sm text-muted-foreground">Platform commission rates and studio-level overrides</p>
+        <p className="text-sm text-muted-foreground">Platform commission rates and partner-level overrides</p>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -117,25 +119,25 @@ export default function AdminCommission() {
         <div className="bg-card border border-border rounded-xl p-6">
           <div className="text-xs uppercase tracking-wider text-muted-foreground font-medium">Default ongoing commission</div>
           <div className="mt-2 text-4xl font-bold text-primary">{defaultRate}%</div>
-          <p className="mt-2 text-sm text-muted-foreground">Applied to all studios unless overridden.</p>
+          <p className="mt-2 text-sm text-muted-foreground">Applied to all partners unless overridden.</p>
           <button onClick={openEdit} className="mt-4 rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-accent">Edit Rate</button>
         </div>
 
         <div className="bg-card border border-border rounded-xl p-6">
           <div className="text-xs uppercase tracking-wider text-muted-foreground font-medium">First booking commission</div>
           <div className="mt-2 text-4xl font-bold">{defaultInitialRate}%</div>
-          <p className="mt-2 text-sm text-muted-foreground">Default initial commission for every studio. Each studio can override it independently.</p>
+          <p className="mt-2 text-sm text-muted-foreground">Default initial commission for every partner. Each partner can override it independently.</p>
           <button onClick={openInitialEdit} className="mt-4 rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-accent">Edit Rate</button>
         </div>
       </div>
 
       <div>
-        <h3 className="text-lg font-bold tracking-tight mb-3">Studio-Level Overrides</h3>
+        <h3 className="text-lg font-bold tracking-tight mb-3">Partner-Level Overrides</h3>
         <div className="bg-card border border-border rounded-xl overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-accent/50 text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
-                <th className="text-left px-4 py-3">Studio</th>
+                <th className="text-left px-4 py-3">Partner</th>
                 <th className="text-left px-4 py-3">City</th>
                 <th className="text-left px-4 py-3">Ongoing commission</th>
                 <th className="text-left px-4 py-3">Initial commission</th>
@@ -203,7 +205,7 @@ export default function AdminCommission() {
         open={editOpen}
         onClose={() => setEditOpen(false)}
         title="Edit default commission"
-        description="Applied to all studios that don't have an override."
+        description="Applied to all partners that don't have an override."
         size="sm"
         footer={
           <>
@@ -232,7 +234,7 @@ export default function AdminCommission() {
         open={initialEditOpen}
         onClose={() => setInitialEditOpen(false)}
         title="Edit default first booking commission"
-        description="Applied to all studios that don't have an initial override."
+        description="Applied to all partners that don't have an initial override."
         size="sm"
         footer={
           <>

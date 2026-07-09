@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { STUDIOS, BOOKINGS, classById } from "@/data/mock";
+import { STUDIOS } from "@/data/mock";
 import { useAccounts } from "@/store/accounts";
-import { Kpi } from "@/components/wp/Kpi";
+import { ApplicationDetailsCard } from "@/components/wp/ApplicationDetailsCard";
 import { StatusBadge } from "@/components/wp/StatusBadge";
-import { ArrowLeft, MapPin, Snowflake, Play } from "lucide-react";
+import { ArrowLeft, CalendarClock, Mail, MapPin, Phone, Play, Snowflake, User } from "lucide-react";
 import { toast } from "sonner";
 
 export default function StudioDetail() {
@@ -19,15 +19,14 @@ export default function StudioDetail() {
     return (
       <div className="space-y-4">
         <Link href="/admin/studios" className="inline-flex items-center gap-1 text-sm text-primary hover:text-secondary">
-          <ArrowLeft className="h-4 w-4" /> Back to studios
+          <ArrowLeft className="h-4 w-4" /> Back to partners
         </Link>
-        <div className="bg-card border border-border rounded-xl px-4 py-12 text-center text-sm text-muted-foreground">Studio not found.</div>
+        <div className="bg-card border border-border rounded-xl px-4 py-12 text-center text-sm text-muted-foreground">Partner not found.</div>
       </div>
     );
   }
 
   const status = studioStatus[studio.id] ?? "Active";
-  const bookings = BOOKINGS.filter((b) => classById(b.classId)?.studioId === studio.id);
 
   const onToggle = () => {
     const next = toggleStudio(studio.id);
@@ -37,7 +36,7 @@ export default function StudioDetail() {
   return (
     <div className="space-y-6">
       <Link href="/admin/studios" className="inline-flex items-center gap-1 text-sm text-primary hover:text-secondary">
-        <ArrowLeft className="h-4 w-4" /> Back to studios
+        <ArrowLeft className="h-4 w-4" /> Back to partners
       </Link>
 
       <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -46,7 +45,7 @@ export default function StudioDetail() {
             <h2 className="text-2xl font-bold tracking-tight">{studio.name}</h2>
             <StatusBadge status={status} />
           </div>
-          <p className="mt-1 text-sm text-muted-foreground">{studio.category} · {studio.location}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{studio.category} - {studio.location}</p>
         </div>
         <button
           onClick={onToggle}
@@ -56,14 +55,24 @@ export default function StudioDetail() {
               : "inline-flex items-center gap-2 rounded-lg bg-destructive/15 px-4 py-2 text-sm font-medium text-destructive hover:bg-destructive/25"
           }
         >
-          {status === "Frozen" ? <><Play className="h-4 w-4" /> Reactivate account</> : <><Snowflake className="h-4 w-4" /> Freeze account</>}
+          {status === "Frozen" ? (
+            <>
+              <Play className="h-4 w-4" /> Reactivate account
+            </>
+          ) : (
+            <>
+              <Snowflake className="h-4 w-4" /> Freeze account
+            </>
+          )}
         </button>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-        <Kpi label="Bookings" value={bookings.length} accent="primary" />
-        <Kpi label="Rating" value={studio.rating} hint={`${studio.reviews} reviews`} accent="success" />
-        <Kpi label="Status" value={status} accent={status === "Frozen" ? "warning" : "success"} />
+      <div className="bg-warning/10 border border-warning/30 rounded-xl p-4 flex items-center gap-3 text-sm">
+        <CalendarClock className="h-5 w-5 text-warning-foreground shrink-0" />
+        <span>
+          This partner applied on <span className="font-medium">{studio.submittedAt}</span> and is currently{" "}
+          <span className="font-medium lowercase">{status}</span>.
+        </span>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-4">
@@ -80,45 +89,20 @@ export default function StudioDetail() {
               ))}
             </div>
           </div>
-          <div className="flex items-center gap-1.5 text-sm text-muted-foreground"><MapPin className="h-4 w-4" /> {studio.location}</div>
         </div>
 
-        <dl className="bg-card border border-border rounded-xl p-5 grid grid-cols-2 gap-4 text-sm h-fit">
-          <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Category</dt><dd className="mt-0.5 font-medium">{studio.category}</dd></div>
-          <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Rating</dt><dd className="mt-0.5 font-mono">{studio.rating}</dd></div>
-          <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Reviews</dt><dd className="mt-0.5 font-mono">{studio.reviews}</dd></div>
-        </dl>
+        <div className="bg-card border border-border rounded-xl p-5">
+          <div className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Applicant contact</div>
+          <dl className="space-y-3 text-sm">
+            <div className="flex items-center gap-2"><User className="h-4 w-4 text-muted-foreground" /><span>{studio.owner}</span></div>
+            <div className="flex items-center gap-2"><Mail className="h-4 w-4 text-muted-foreground" /><a href={`mailto:${studio.email}`} className="text-primary hover:text-secondary break-all">{studio.email}</a></div>
+            <div className="flex items-center gap-2"><Phone className="h-4 w-4 text-muted-foreground" /><span className="font-mono">{studio.phone}</span></div>
+            <div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-muted-foreground" /><span>{studio.location}</span></div>
+          </dl>
+        </div>
       </div>
 
-      <div className="bg-card border border-border rounded-xl overflow-x-auto">
-        <h3 className="font-semibold p-5 pb-3">Bookings at this studio ({bookings.length})</h3>
-        {bookings.length === 0 ? (
-          <p className="px-5 pb-5 text-sm text-muted-foreground">No bookings on record.</p>
-        ) : (
-          <table className="w-full text-sm">
-            <thead className="bg-accent/50 text-xs uppercase tracking-wider text-muted-foreground">
-              <tr>
-                <th className="text-left px-4 py-3">Ref</th>
-                <th className="text-left px-4 py-3">Customer</th>
-                <th className="text-left px-4 py-3">Class</th>
-                <th className="text-left px-4 py-3">Status</th>
-                <th className="text-left px-4 py-3">Date</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {bookings.map((b) => (
-                <tr key={b.ref} className="hover:bg-accent/30">
-                  <td className="px-4 py-3 font-mono text-xs">{b.ref}</td>
-                  <td className="px-4 py-3 font-medium">{b.customer}</td>
-                  <td className="px-4 py-3 text-muted-foreground">{classById(b.classId)?.name ?? "—"}</td>
-                  <td className="px-4 py-3"><StatusBadge status={b.status} /></td>
-                  <td className="px-4 py-3 text-xs text-muted-foreground">{b.createdAt}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+      <ApplicationDetailsCard partner={studio} status={status} />
     </div>
   );
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { CREDIT_VALUE_SAR, PLATFORM_COMMISSION_PCT } from "@/data/settings";
 import { Switch } from "@/components/wp/Switch";
 import { toast } from "sonner";
 
@@ -18,11 +17,7 @@ function Toggle({ checked, onChange, label, hint }: { checked: boolean; onChange
 }
 
 export default function AdminSettings() {
-  const [commission, setCommission] = useState(PLATFORM_COMMISSION_PCT);
-  const [creditValue, setCreditValue] = useState(CREDIT_VALUE_SAR);
-  const [bookingWindow, setBookingWindow] = useState(14);
   const [autoApprove, setAutoApprove] = useState(false);
-  const [waitlist, setWaitlist] = useState(true);
   const [maintenance, setMaintenance] = useState(false);
 
   const save = (e: React.FormEvent) => {
@@ -37,29 +32,10 @@ export default function AdminSettings() {
         <p className="text-sm text-muted-foreground">Global configuration for the WellPass platform</p>
       </div>
 
-      <div className="bg-card border border-border rounded-xl p-5 space-y-4">
-        <h3 className="font-semibold">Commercials</h3>
-        <div className="grid sm:grid-cols-3 gap-4">
-          <label className="block text-sm">
-            <span className="font-medium">Commission rate (%)</span>
-            <input type="number" min={0} max={100} value={commission} onChange={(e) => setCommission(Number(e.target.value))} className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
-          </label>
-          <label className="block text-sm">
-            <span className="font-medium">Credit value (SAR)</span>
-            <input type="number" min={0} step={0.1} value={creditValue} onChange={(e) => setCreditValue(Number(e.target.value))} className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
-          </label>
-          <label className="block text-sm">
-            <span className="font-medium">Booking window (days)</span>
-            <input type="number" min={1} max={90} value={bookingWindow} onChange={(e) => setBookingWindow(Number(e.target.value))} className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
-          </label>
-        </div>
-      </div>
-
       <div className="bg-card border border-border rounded-xl p-5">
         <h3 className="font-semibold">Operations</h3>
         <div className="divide-y divide-border">
-          <Toggle label="Auto-approve new studios" hint="Skip manual review when studios register" checked={autoApprove} onChange={setAutoApprove} />
-          <Toggle label="Enable class waitlists" hint="Let customers join waitlists for full classes" checked={waitlist} onChange={setWaitlist} />
+          <Toggle label="Auto-approve new partners" hint="Skip manual review when partners register" checked={autoApprove} onChange={setAutoApprove} />
           <Toggle label="Maintenance mode" hint="Temporarily take the customer app offline" checked={maintenance} onChange={setMaintenance} />
         </div>
       </div>

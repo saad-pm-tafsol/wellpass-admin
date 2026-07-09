@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     default: "WellPass Admin",
     template: "%s · WellPass Admin",
   },
-  description: "Super-admin console for the WellPass platform — studios, customers, bookings, revenue and more.",
+  description: "Super-admin console for the WellPass platform — partners, customers, bookings, revenue and more.",
   robots: { index: false, follow: false },
 };
 

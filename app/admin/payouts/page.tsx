@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { PAYOUTS, type Payout } from "@/data/payouts";
 import { Kpi } from "@/components/wp/Kpi";
@@ -37,7 +38,7 @@ export default function AdminPayouts() {
       toast.message("No pending payouts to release");
       return;
     }
-    toast.success(`Released ${sar(pendingTotal)} across ${pendingCount} ${pendingCount === 1 ? "studio" : "studios"}`);
+    toast.success(`Released ${sar(pendingTotal)} across ${pendingCount} ${pendingCount === 1 ? "partner" : "partners"}`);
     setPayouts((prev) => prev.map((p) => (p.status === "Pending" ? { ...p, status: "Completed" } : p)));
   };
 
@@ -45,8 +46,8 @@ export default function AdminPayouts() {
     <div className="space-y-6">
       <div className="flex items-end justify-between gap-4 flex-wrap">
         <div>
-          <h2 className="text-xl font-bold tracking-tight">Studio payouts</h2>
-          <p className="text-sm text-muted-foreground">Settlements owed to partner studios</p>
+          <h2 className="text-xl font-bold tracking-tight">Partner payouts</h2>
+          <p className="text-sm text-muted-foreground">Settlements owed to partners</p>
         </div>
         <button onClick={releasePending} className="rounded-lg bg-success px-3 py-2 text-sm font-medium text-white hover:bg-success/80">
           Release pending
@@ -54,9 +55,9 @@ export default function AdminPayouts() {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Kpi label="Pending payouts" value={sar(pendingTotal)} accent="warning" hint={`${pendingCount} ${pendingCount === 1 ? "studio" : "studios"}`} />
+        <Kpi label="Pending payouts" value={sar(pendingTotal)} accent="warning" hint={`${pendingCount} ${pendingCount === 1 ? "partner" : "partners"}`} />
         <Kpi label="Completed" value={sar(completedTotal)} accent="success" />
-        <Kpi label="Studios" value={payouts.length} />
+        <Kpi label="Partners" value={payouts.length} />
         <Kpi label="Total owed" value={sar(pendingTotal + completedTotal)} accent="primary" />
       </div>
 
@@ -69,7 +70,7 @@ export default function AdminPayouts() {
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search studio..."
+                placeholder="Search partner..."
                 className="rounded-lg border border-input bg-card pl-9 pr-3 py-2 text-sm w-48 focus:outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
@@ -83,7 +84,7 @@ export default function AdminPayouts() {
         <table className="w-full text-sm mt-4">
           <thead className="bg-accent/50 text-xs uppercase tracking-wider text-muted-foreground">
             <tr>
-              <th className="text-left px-4 py-3">Studio</th>
+              <th className="text-left px-4 py-3">Partner</th>
               <th className="text-left px-4 py-3">Amount</th>
               <th className="text-left px-4 py-3">Status</th>
               <th className="text-left px-4 py-3">Action</th>
@@ -96,11 +97,12 @@ export default function AdminPayouts() {
                 <td className="px-4 py-3 font-mono">{sar(p.amount)}</td>
                 <td className="px-4 py-3"><StatusBadge status={p.status} /></td>
                 <td className="px-4 py-3">
-                  {p.status === "Pending" ? (
-                    <button onClick={() => payNow(p.id, p.studio)} className="text-xs text-primary hover:text-secondary font-medium">Pay now</button>
-                  ) : (
-                    <span className="text-xs text-muted-foreground">—</span>
-                  )}
+                  <div className="flex flex-wrap items-center gap-3">
+                    {p.status === "Pending" && (
+                      <button onClick={() => payNow(p.id, p.studio)} className="text-xs text-primary hover:text-secondary font-medium">Pay now</button>
+                    )}
+                    <Link href={`/admin/payouts/${encodeURIComponent(p.id)}`} className="text-xs text-primary hover:text-secondary font-medium">View</Link>
+                  </div>
                 </td>
               </tr>
             ))}

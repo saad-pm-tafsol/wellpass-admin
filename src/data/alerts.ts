@@ -11,8 +11,8 @@ export type AdminAlert = {
 };
 
 export const ADMIN_ALERTS: AdminAlert[] = [
-  { id: "al1", type: "warning", title: "Studio awaiting approval", body: "PowerLift Athletics submitted an application and is pending review.", time: "2h ago", href: "/admin/studios" },
-  { id: "al2", type: "info", title: "7 quarterly payouts due", body: "SAR 28.6k across 7 studios is ready to be released.", time: "5h ago", href: "/admin/revenue" },
+  { id: "al1", type: "warning", title: "Partner awaiting approval", body: "PowerLift Athletics submitted an application and is pending review.", time: "2h ago", href: "/admin/studios" },
+  { id: "al2", type: "info", title: "7 quarterly payouts due", body: "SAR 28.6k across 7 partners is ready to be released.", time: "5h ago", href: "/admin/revenue" },
   { id: "al3", type: "error", title: "Booking dispute opened", body: "Khalid Al-Shehri disputed booking WP-2025-04813.", time: "Yesterday", href: "/admin/bookings" },
   { id: "al4", type: "success", title: "Revenue milestone reached", body: "The platform crossed SAR 84k in lifetime revenue.", time: "Yesterday", href: "/admin/revenue" },
   { id: "al5", type: "info", title: "Customer registrations up 18%", body: "64 new customers signed up on Saturday — a weekly high.", time: "2 days ago", href: "/admin/dashboard" },

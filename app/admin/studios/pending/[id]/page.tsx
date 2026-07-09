@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { PENDING_STUDIOS } from "@/data/mock";
 import { useAccounts } from "@/store/accounts";
+import { ApplicationDetailsCard } from "@/components/wp/ApplicationDetailsCard";
 import { StatusBadge } from "@/components/wp/StatusBadge";
 import { ArrowLeft, Mail, Phone, User, MapPin, CalendarClock } from "lucide-react";
 import { toast } from "sonner";
@@ -20,7 +21,7 @@ export default function PendingStudioDetail() {
     return (
       <div className="space-y-4">
         <Link href="/admin/studios" className="inline-flex items-center gap-1 text-sm text-primary hover:text-secondary">
-          <ArrowLeft className="h-4 w-4" /> Back to studios
+          <ArrowLeft className="h-4 w-4" /> Back to partners
         </Link>
         <div className="bg-card border border-border rounded-xl px-4 py-12 text-center text-sm text-muted-foreground">Application not found.</div>
       </div>
@@ -36,7 +37,7 @@ export default function PendingStudioDetail() {
   return (
     <div className="space-y-6">
       <Link href="/admin/studios" className="inline-flex items-center gap-1 text-sm text-primary hover:text-secondary">
-        <ArrowLeft className="h-4 w-4" /> Back to studios
+        <ArrowLeft className="h-4 w-4" /> Back to partners
       </Link>
 
       <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -58,7 +59,7 @@ export default function PendingStudioDetail() {
       <div className="bg-warning/10 border border-warning/30 rounded-xl p-4 flex items-center gap-3 text-sm">
         <CalendarClock className="h-5 w-5 text-warning-foreground shrink-0" />
         {stillPending ? (
-          <span>This studio applied on <span className="font-medium">{studio.submittedAt}</span> and is awaiting review.</span>
+          <span>This partner applied on <span className="font-medium">{studio.submittedAt}</span> and is awaiting review.</span>
         ) : (
           <span>This application has already been processed.</span>
         )}
@@ -91,19 +92,7 @@ export default function PendingStudioDetail() {
         </div>
       </div>
 
-      <div className="bg-card border border-border rounded-xl p-5">
-        <h3 className="font-semibold mb-4">Application details</h3>
-        <dl className="grid grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-          <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Studio name</dt><dd className="mt-0.5 font-medium">{studio.name}</dd></div>
-          <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Owner</dt><dd className="mt-0.5 font-medium">{studio.owner}</dd></div>
-          <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Email</dt><dd className="mt-0.5 break-all">{studio.email}</dd></div>
-          <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Phone</dt><dd className="mt-0.5 font-mono">{studio.phone}</dd></div>
-          <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Category</dt><dd className="mt-0.5">{studio.category}</dd></div>
-          <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Location</dt><dd className="mt-0.5">{studio.location}</dd></div>
-          <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Submitted</dt><dd className="mt-0.5">{studio.submittedAt}</dd></div>
-          <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Status</dt><dd className="mt-1"><StatusBadge status="Pending" /></dd></div>
-        </dl>
-      </div>
+      <ApplicationDetailsCard partner={studio} status={stillPending ? "Pending" : "Completed"} />
     </div>
   );
 }

@@ -7,26 +7,48 @@ import { Modal } from "@/components/wp/Modal";
 import { Plus, Search, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
-type Category = { id: string; name: string; icon: string };
+type CategoryItem = { id: string; name: string; icon: string };
+
+const DEFAULT_PARTNER_TYPE = "Fitness & Wellness Studio";
+const ADD_TYPE_VALUE = "__add_type__";
+const INITIAL_PARTNER_TYPES = [
+  DEFAULT_PARTNER_TYPE,
+  "Sports Academy & Club",
+  "Gym",
+  "Wellness Center",
+  "Personal Training",
+];
 
 export default function AdminCategories() {
-  const [categories, setCategories] = useState<Category[]>(() => CATEGORIES.map((c, i) => ({ id: `c${i}`, name: c.name, icon: c.icon })));
+  const [partnerTypes, setPartnerTypes] = useState<string[]>(INITIAL_PARTNER_TYPES);
+  const [selectedType, setSelectedType] = useState(DEFAULT_PARTNER_TYPE);
+  const [categoriesByType, setCategoriesByType] = useState<Record<string, CategoryItem[]>>(() => ({
+    [DEFAULT_PARTNER_TYPE]: CATEGORIES.map((c, i) => ({ id: `c${i}`, name: c.name, icon: c.icon })),
+    "Sports Academy & Club": [],
+    Gym: [],
+    "Wellness Center": [],
+    "Personal Training": [],
+  }));
   const [query, setQuery] = useState("");
 
   const nextId = useRef(CATEGORIES.length);
 
-  // Add / edit modal.
   const [formOpen, setFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formName, setFormName] = useState("");
   const [formIcon, setFormIcon] = useState("");
 
-  // Delete confirm modal.
+  const [typeOpen, setTypeOpen] = useState(false);
+  const [typeName, setTypeName] = useState("");
+
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const categories = useMemo(() => categoriesByType[selectedType] ?? [], [categoriesByType, selectedType]);
   const deleting = categories.find((c) => c.id === deletingId) ?? null;
 
-  const studiosIn = (name: string) => STUDIOS.filter((s) => s.category === name).length;
-  const used = categories.filter((c) => studiosIn(c.name) > 0).length;
+  const partnersInCategory = (name: string) =>
+    selectedType === DEFAULT_PARTNER_TYPE ? STUDIOS.filter((s) => s.category === name).length : 0;
+  const used = categories.filter((c) => partnersInCategory(c.name) > 0).length;
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -40,7 +62,7 @@ export default function AdminCategories() {
     setFormOpen(true);
   };
 
-  const openEdit = (c: Category) => {
+  const openEdit = (c: CategoryItem) => {
     setEditingId(c.id);
     setFormName(c.name);
     setFormIcon(c.icon);
@@ -54,22 +76,58 @@ export default function AdminCategories() {
       toast.error("Category name is required");
       return;
     }
-    const icon = formIcon.trim() || "🏷️";
-    if (editingId) {
-      setCategories((prev) => prev.map((c) => (c.id === editingId ? { ...c, name, icon } : c)));
-      toast.success(`“${name}” updated`);
-    } else {
-      const id = `c${nextId.current++}`;
-      setCategories((prev) => [...prev, { id, name, icon }]);
-      toast.success(`“${name}” added`);
-    }
+
+    const icon = formIcon.trim() || "#";
+    setCategoriesByType((prev) => {
+      const current = prev[selectedType] ?? [];
+      const next = editingId
+        ? current.map((c) => (c.id === editingId ? { ...c, name, icon } : c))
+        : [...current, { id: `c${nextId.current++}`, name, icon }];
+      return { ...prev, [selectedType]: next };
+    });
+    toast.success(editingId ? `"${name}" updated` : `"${name}" added`);
     setFormOpen(false);
+  };
+
+  const submitType = (e: React.FormEvent) => {
+    e.preventDefault();
+    const name = typeName.trim();
+    if (!name) {
+      toast.error("Type name is required");
+      return;
+    }
+    if (partnerTypes.some((type) => type.toLowerCase() === name.toLowerCase())) {
+      toast.error("Type already exists");
+      return;
+    }
+
+    setPartnerTypes((prev) => [...prev, name]);
+    setCategoriesByType((prev) => ({ ...prev, [name]: [] }));
+    setSelectedType(name);
+    setQuery("");
+    setTypeName("");
+    setTypeOpen(false);
+    toast.success(`"${name}" type added`);
   };
 
   const confirmDelete = () => {
     if (!deleting) return;
-    setCategories((prev) => prev.filter((c) => c.id !== deleting.id));
-    toast.success(`“${deleting.name}” deleted`);
+    setCategoriesByType((prev) => ({
+      ...prev,
+      [selectedType]: (prev[selectedType] ?? []).filter((c) => c.id !== deleting.id),
+    }));
+    toast.success(`"${deleting.name}" deleted`);
+    setDeletingId(null);
+  };
+
+  const handleTypeChange = (value: string) => {
+    if (value === ADD_TYPE_VALUE) {
+      setTypeName("");
+      setTypeOpen(true);
+      return;
+    }
+    setSelectedType(value);
+    setQuery("");
     setDeletingId(null);
   };
 
@@ -78,7 +136,7 @@ export default function AdminCategories() {
       <div className="flex items-end justify-between gap-4 flex-wrap">
         <div>
           <h2 className="text-xl font-bold tracking-tight">Categories</h2>
-          <p className="text-sm text-muted-foreground">Activity types studios can list under</p>
+          <p className="text-sm text-muted-foreground">Activity types partners can list under for {selectedType}</p>
         </div>
         <div className="flex gap-2 flex-wrap">
           <div className="relative">
@@ -90,6 +148,17 @@ export default function AdminCategories() {
               className="rounded-lg border border-input bg-card pl-9 pr-3 py-2 text-sm w-52 focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
+          <select
+            value={selectedType}
+            onChange={(e) => handleTypeChange(e.target.value)}
+            className="rounded-lg border border-input bg-card px-3 py-2 text-sm min-w-56 focus:outline-none focus:ring-2 focus:ring-ring"
+            aria-label="Partner type"
+          >
+            {partnerTypes.map((type) => (
+              <option key={type} value={type}>{type}</option>
+            ))}
+            <option value={ADD_TYPE_VALUE}>+ Add new type</option>
+          </select>
           <button onClick={openAdd} className="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-secondary">
             <Plus className="h-4 w-4" /> Add category
           </button>
@@ -103,11 +172,13 @@ export default function AdminCategories() {
       </div>
 
       {filtered.length === 0 ? (
-        <div className="bg-card border border-border rounded-xl px-4 py-12 text-center text-sm text-muted-foreground">No categories match your search.</div>
+        <div className="bg-card border border-border rounded-xl px-4 py-12 text-center text-sm text-muted-foreground">
+          {categories.length === 0 ? "No categories for this type yet. Add one to get started." : "No categories match your search."}
+        </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {filtered.map((c) => {
-            const count = studiosIn(c.name);
+            const count = partnersInCategory(c.name);
             return (
               <div key={c.id} className="bg-card border border-border rounded-xl p-5 card-hover">
                 <div className="flex items-start justify-between">
@@ -122,19 +193,18 @@ export default function AdminCategories() {
                   </div>
                 </div>
                 <div className="mt-3 font-semibold leading-tight">{c.name}</div>
-                <div className="mt-1 text-xs text-muted-foreground">{count} {count === 1 ? "studio" : "studios"}</div>
+                <div className="mt-1 text-xs text-muted-foreground">{count} {count === 1 ? "partner" : "partners"}</div>
               </div>
             );
           })}
         </div>
       )}
 
-      {/* Add / edit */}
       <Modal
         open={formOpen}
         onClose={() => setFormOpen(false)}
         title={editingId ? "Edit category" : "Add category"}
-        description={editingId ? "Update this activity type." : "Create a new activity type for studios."}
+        description={editingId ? "Update this activity type." : `Create a new activity type for ${selectedType}.`}
         footer={
           <>
             <button type="button" onClick={() => setFormOpen(false)} className="rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-accent">Cancel</button>
@@ -154,19 +224,45 @@ export default function AdminCategories() {
             />
           </label>
           <label className="block text-sm">
-            <span className="font-medium">Icon (emoji)</span>
+            <span className="font-medium">Icon</span>
             <input
               value={formIcon}
               onChange={(e) => setFormIcon(e.target.value)}
-              placeholder="🧘"
+              placeholder="#"
               className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
             />
-            <span className="mt-1 block text-xs text-muted-foreground">Optional — defaults to 🏷️.</span>
+            <span className="mt-1 block text-xs text-muted-foreground">Optional. Defaults to #.</span>
           </label>
         </form>
       </Modal>
 
-      {/* Delete confirm */}
+      <Modal
+        open={typeOpen}
+        onClose={() => setTypeOpen(false)}
+        title="Add partner type"
+        description="Create a new type with its own category list."
+        size="sm"
+        footer={
+          <>
+            <button type="button" onClick={() => setTypeOpen(false)} className="rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-accent">Cancel</button>
+            <button type="submit" form="type-form" className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-secondary">Add type</button>
+          </>
+        }
+      >
+        <form id="type-form" onSubmit={submitType}>
+          <label className="block text-sm">
+            <span className="font-medium">Type name</span>
+            <input
+              value={typeName}
+              onChange={(e) => setTypeName(e.target.value)}
+              placeholder="e.g. Recovery Clinic"
+              autoFocus
+              className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+          </label>
+        </form>
+      </Modal>
+
       <Modal
         open={deleting !== null}
         onClose={() => setDeletingId(null)}
@@ -180,7 +276,7 @@ export default function AdminCategories() {
         }
       >
         <p className="text-sm text-muted-foreground">
-          Delete <span className="font-medium text-foreground">“{deleting?.name}”</span>? This can’t be undone.
+          Delete <span className="font-medium text-foreground">{deleting?.name}</span>? This cannot be undone.
         </p>
       </Modal>
     </div>
