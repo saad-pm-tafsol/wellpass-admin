@@ -11,9 +11,9 @@ import { cn } from "@/lib/utils";
  * surfaces set `onDark` to place it on a white card and keep it legible.
  */
 const ASSETS = {
-  full: { src: "/wellpass-full.png", w: 595, h: 457 },
-  logo: { src: "/wellpass-logo.png", w: 594, h: 410 },
-  mark: { src: "/wellpass-mark.png", w: 416, h: 259 },
+  full: { src: "/wellpass-full.png", w: 1689, h: 1664 },
+  logo: { src: "/wellpass-logo.png", w: 1444, h: 1006 },
+  mark: { src: "/wellpass-mark.png", w: 1009, h: 616 },
 } as const;
 
 export function Logo({
