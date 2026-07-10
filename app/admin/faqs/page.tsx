@@ -5,7 +5,8 @@ import { Kpi } from "@/components/wp/Kpi";
 import { Modal } from "@/components/wp/Modal";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
-import { DEFAULT_FAQS, readStoredFaqs, writeStoredFaqs, type Faq } from "@/lib/faqs";
+import { DEFAULT_FAQS, type Faq } from "@/lib/faqs";
+import { fetchFaqs, saveFaqs } from "@/lib/content-client";
 
 export default function AdminFaqs() {
   const [faqs, setFaqs] = useState<Faq[]>(DEFAULT_FAQS);
@@ -17,13 +18,15 @@ export default function AdminFaqs() {
   const [answer, setAnswer] = useState("");
   const [stepsText, setStepsText] = useState("");
 
-  // Load the current (possibly admin-edited) FAQs and mirror any change back to
-  // the shared key so the public FAQ page stays in sync.
-  useEffect(() => setFaqs(readStoredFaqs()), []);
+  // Load the current (possibly admin-edited) FAQs from the shared content API
+  // and mirror any change back so the public FAQ page stays in sync.
+  useEffect(() => {
+    fetchFaqs().then(setFaqs);
+  }, []);
 
   const persist = (next: Faq[]) => {
     setFaqs(next);
-    writeStoredFaqs(next);
+    void saveFaqs(next);
   };
 
   const openCreate = () => {
@@ -50,7 +53,10 @@ export default function AdminFaqs() {
     const a = answer.trim();
     if (!steps.length && !a) return toast.error("Provide an answer or at least one step");
 
-    const entry = steps.length ? { q, a: "", steps } : { q, a };
+    // Always set `steps` explicitly (to undefined when cleared) so switching an
+    // FAQ back from steps to a plain answer overwrites the old steps instead of
+    // leaving them on the merged object.
+    const entry = { q, a: steps.length ? "" : a, steps: steps.length ? steps : undefined };
     const next = editingId
       ? faqs.map((f) => (f.id === editingId ? { ...f, ...entry } : f))
       : [...faqs, { id: `faq_${nextId.current++}_${faqs.length}`, ...entry }];

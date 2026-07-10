@@ -7,7 +7,8 @@ import { Modal } from "@/components/wp/Modal";
 import { cn } from "@/lib/utils";
 import { Check, Plus } from "lucide-react";
 import { toast } from "sonner";
-import { readStoredPlanValidity, writeStoredPlanValidity, planValidityMap } from "@/lib/membership-plans";
+import { planValidityMap } from "@/lib/membership-plans";
+import { fetchPlanValidity, savePlanValidity } from "@/lib/content-client";
 
 type Plan = { id: string; name: string; credits: number; price: number; validityMonths: number; popular?: boolean };
 
@@ -18,15 +19,16 @@ export default function AdminMembershipPlans() {
   // Reflect any validity previously configured (and mirrored to the customer
   // site) so this screen stays in sync with what customers currently see.
   useEffect(() => {
-    const stored = readStoredPlanValidity();
-    setPlans((prev) => prev.map((p) => (stored[p.id] ? { ...p, validityMonths: stored[p.id] } : p)));
+    fetchPlanValidity().then((stored) => {
+      setPlans((prev) => prev.map((p) => (stored[p.id] ? { ...p, validityMonths: stored[p.id] } : p)));
+    });
   }, []);
 
   // Persist the { planId: months } map whenever plans change so the customer
   // plan cards pick up the new validity.
   const persist = (next: Plan[]) => {
     setPlans(next);
-    writeStoredPlanValidity(planValidityMap(next));
+    void savePlanValidity(planValidityMap(next));
   };
 
   const [open, setOpen] = useState(false);

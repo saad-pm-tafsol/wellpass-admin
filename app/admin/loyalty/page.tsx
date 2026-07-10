@@ -8,11 +8,10 @@ import { Switch } from "@/components/wp/Switch";
 import { useAccounts } from "@/store/accounts";
 import {
   DEFAULT_LOYALTY_EARNING_RULES,
-  readStoredLoyaltyEarningRules,
-  writeStoredLoyaltyEarningRules,
   type LoyaltyEarningRule,
   type LoyaltyEarningRuleIcon,
 } from "@/lib/loyalty-rules";
+import { fetchLoyaltyRules, saveLoyaltyRules } from "@/lib/content-client";
 import { toast } from "sonner";
 
 const ruleIcons: Record<LoyaltyEarningRuleIcon, typeof CheckCircle2> = {
@@ -32,7 +31,7 @@ export default function AdminLoyalty() {
   }, [ranked, query]);
 
   useEffect(() => {
-    setEarningRules(readStoredLoyaltyEarningRules());
+    fetchLoyaltyRules().then(setEarningRules);
   }, []);
 
   const updateRule = (id: LoyaltyEarningRule["id"], patch: Partial<Pick<LoyaltyEarningRule, "points" | "enabled">>) => {
@@ -40,7 +39,7 @@ export default function AdminLoyalty() {
   };
 
   const saveRules = () => {
-    writeStoredLoyaltyEarningRules(earningRules);
+    void saveLoyaltyRules(earningRules);
     toast.success("Point earning rules updated");
   };
 
