@@ -108,7 +108,7 @@ export default function AdminLogin() {
     <div className="min-h-screen grid lg:grid-cols-2 bg-background">
       <div className="hidden lg:flex flex-col justify-between brand-gradient text-white p-12">
         <span className="flex items-center">
-          <Logo variant="full" onDark priority imgClassName="h-20" />
+          <Logo variant="full" onDark priority />
         </span>
         <div>
           <h2 className="text-4xl font-extrabold leading-tight">Run the platform with confidence.</h2>

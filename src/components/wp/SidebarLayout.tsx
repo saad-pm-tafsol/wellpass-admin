@@ -37,7 +37,7 @@ export function SidebarLayout({
       )}>
         <div className="px-5 py-5 border-b border-inherit">
           <Link href="/admin/dashboard" className="block">
-            <Logo variant="logo" onDark={dark} imgClassName="h-9" />
+            <Logo variant="logo" onDark={dark} />
             <div className={cn("mt-2 text-xs", dark ? "text-sidebar-foreground/60" : "text-muted-foreground")}>{subtitle}</div>
           </Link>
         </div>

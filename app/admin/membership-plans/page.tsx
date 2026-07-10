@@ -1,18 +1,33 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PLANS } from "@/data/mock";
 import { Kpi } from "@/components/wp/Kpi";
 import { Modal } from "@/components/wp/Modal";
 import { cn } from "@/lib/utils";
 import { Check, Plus } from "lucide-react";
 import { toast } from "sonner";
+import { readStoredPlanValidity, writeStoredPlanValidity, planValidityMap } from "@/lib/membership-plans";
 
 type Plan = { id: string; name: string; credits: number; price: number; validityMonths: number; popular?: boolean };
 
 export default function AdminMembershipPlans() {
   const [plans, setPlans] = useState<Plan[]>(PLANS);
   const nextId = useRef(PLANS.length);
+
+  // Reflect any validity previously configured (and mirrored to the customer
+  // site) so this screen stays in sync with what customers currently see.
+  useEffect(() => {
+    const stored = readStoredPlanValidity();
+    setPlans((prev) => prev.map((p) => (stored[p.id] ? { ...p, validityMonths: stored[p.id] } : p)));
+  }, []);
+
+  // Persist the { planId: months } map whenever plans change so the customer
+  // plan cards pick up the new validity.
+  const persist = (next: Plan[]) => {
+    setPlans(next);
+    writeStoredPlanValidity(planValidityMap(next));
+  };
 
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -48,20 +63,18 @@ export default function AdminMembershipPlans() {
     if (!trimmed) return toast.error("Plan name is required");
     if (credits <= 0 || price <= 0 || validityMonths <= 0) return toast.error("Credits, price, and validity must be greater than zero");
 
-    setPlans((prev) => {
-      const cleared = popular ? prev.map((p) => ({ ...p, popular: false })) : prev;
-      if (editingId) {
-        return cleared.map((p) => (p.id === editingId ? { ...p, name: trimmed, credits, price, validityMonths, popular } : p));
-      }
-      return [...cleared, { id: `p${nextId.current++}`, name: trimmed, credits, price, validityMonths, popular }];
-    });
+    const cleared = popular ? plans.map((p) => ({ ...p, popular: false })) : plans;
+    const next = editingId
+      ? cleared.map((p) => (p.id === editingId ? { ...p, name: trimmed, credits, price, validityMonths, popular } : p))
+      : [...cleared, { id: `p${nextId.current++}`, name: trimmed, credits, price, validityMonths, popular }];
+    persist(next);
     toast.success(editingId ? `"${trimmed}" updated` : `"${trimmed}" created`);
     setOpen(false);
   };
 
-  const archive = (p: Plan) => {
-    setPlans((prev) => prev.filter((x) => x.id !== p.id));
-    toast.success(`"${p.name}" archived`);
+  const remove = (p: Plan) => {
+    persist(plans.filter((x) => x.id !== p.id));
+    toast.success(`"${p.name}" deleted`);
   };
 
   return (
@@ -101,7 +114,7 @@ export default function AdminMembershipPlans() {
               </ul>
               <div className="mt-5 flex gap-2">
                 <button onClick={() => openEdit(p)} className="flex-1 rounded-lg border border-border px-3 py-2 text-sm font-medium hover:bg-accent">Edit</button>
-                <button onClick={() => archive(p)} className="rounded-lg border border-border px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10">Archive</button>
+                <button onClick={() => remove(p)} className="rounded-lg border border-border px-3 py-2 text-sm font-medium text-destructive hover:bg-destructive/10">Delete</button>
               </div>
             </div>
           ))}

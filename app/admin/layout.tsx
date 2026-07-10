@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { SidebarLayout } from "@/components/wp/SidebarLayout";
-import { LayoutDashboard, Building2, Users, ClipboardList, Coins, ArrowLeftRight, Tags, Gift, Wallet, Banknote, Percent, ScrollText, Bell, Settings as SettingsIcon } from "lucide-react";
+import { LayoutDashboard, Building2, Users, ClipboardList, Coins, ArrowLeftRight, Tags, Gift, Wallet, Banknote, Percent, ScrollText, HelpCircle, Bell, Settings as SettingsIcon } from "lucide-react";
 
 const nav = [
   { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -18,6 +18,7 @@ const nav = [
   { to: "/admin/commission", label: "Commission", icon: Percent },
   { to: "/admin/notifications", label: "Notifications", icon: Bell },
   { to: "/admin/settings", label: "Settings", icon: SettingsIcon },
+  { to: "/admin/faqs", label: "FAQs", icon: HelpCircle },
   { to: "/admin/terms", label: "Terms & Policies", icon: ScrollText },
 ];
 
@@ -35,6 +36,7 @@ const titles: Record<string, string> = {
   "/admin/commission": "Commission",
   "/admin/settings": "Platform Settings",
   "/admin/notifications": "Notifications",
+  "/admin/faqs": "FAQs",
   "/admin/terms": "Terms & Policies",
 };
 

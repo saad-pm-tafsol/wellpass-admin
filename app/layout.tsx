@@ -10,6 +10,7 @@ import "@fontsource/jetbrains-mono/600.css";
 
 import "./globals.css";
 import { Providers } from "./providers";
+import { NavigationLoader } from "@/components/wp/NavigationLoader";
 
 function resolveMetadataBase(): URL {
   const raw =
@@ -43,6 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body>
         <Providers>{children}</Providers>
+        <NavigationLoader />
       </body>
     </html>
   );

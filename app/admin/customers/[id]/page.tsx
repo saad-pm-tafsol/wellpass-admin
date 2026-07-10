@@ -16,12 +16,9 @@ type CustomerSignupProfile = {
   phone: string;
   dateOfBirth: string;
   gender: string;
-  nationality: string;
   city: string;
-  preferredLanguage: string;
   joinedAt: string;
   referralCode: string;
-  marketingOptIn: boolean;
 };
 
 const SIGNUP_PROFILES: Record<string, CustomerSignupProfile> = {
@@ -29,56 +26,41 @@ const SIGNUP_PROFILES: Record<string, CustomerSignupProfile> = {
     phone: "+966 50 884 2190",
     dateOfBirth: "1993-04-18",
     gender: "Female",
-    nationality: "Saudi",
     city: "Riyadh",
-    preferredLanguage: "English",
     joinedAt: "2025-01-12",
     referralCode: "SARA2025",
-    marketingOptIn: true,
   },
   "ahmed@example.com": {
     phone: "+966 55 129 7740",
     dateOfBirth: "1988-11-03",
     gender: "Male",
-    nationality: "Saudi",
     city: "Riyadh",
-    preferredLanguage: "Arabic",
     joinedAt: "2024-12-04",
     referralCode: "AHMED2025",
-    marketingOptIn: true,
   },
   "noura@example.com": {
     phone: "+966 56 440 1182",
     dateOfBirth: "1997-07-26",
     gender: "Female",
-    nationality: "Saudi",
     city: "Jeddah",
-    preferredLanguage: "Arabic",
     joinedAt: "2025-03-19",
     referralCode: "NOURA2025",
-    marketingOptIn: false,
   },
   "khalid@example.com": {
     phone: "+966 54 771 0933",
     dateOfBirth: "1991-02-14",
     gender: "Male",
-    nationality: "Saudi",
     city: "Dammam",
-    preferredLanguage: "English",
     joinedAt: "2025-04-07",
     referralCode: "KHALID2025",
-    marketingOptIn: false,
   },
   "fatima@example.com": {
     phone: "+966 53 226 5801",
     dateOfBirth: "1995-09-09",
     gender: "Female",
-    nationality: "Saudi",
     city: "Al Khobar",
-    preferredLanguage: "Arabic",
     joinedAt: "2025-02-22",
     referralCode: "FATIMA2025",
-    marketingOptIn: true,
   },
 };
 
@@ -152,9 +134,7 @@ export default function CustomerDetail() {
           <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Phone</dt><dd className="mt-0.5 font-mono">{signupProfile.phone}</dd></div>
           <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Date of birth</dt><dd className="mt-0.5 font-mono">{signupProfile.dateOfBirth}</dd></div>
           <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Gender</dt><dd className="mt-0.5">{signupProfile.gender}</dd></div>
-          <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Nationality</dt><dd className="mt-0.5">{signupProfile.nationality}</dd></div>
           <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">City</dt><dd className="mt-0.5">{signupProfile.city}</dd></div>
-          <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Preferred language</dt><dd className="mt-0.5">{signupProfile.preferredLanguage}</dd></div>
           <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Signup date</dt><dd className="mt-0.5 font-mono">{signupProfile.joinedAt}</dd></div>
           <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Status</dt><dd className="mt-1"><StatusBadge status={status} /></dd></div>
           <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Membership plan</dt><dd className="mt-0.5 font-medium">{customer.plan}</dd></div>
@@ -162,7 +142,6 @@ export default function CustomerDetail() {
           <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Total bookings</dt><dd className="mt-0.5 font-mono">{customer.bookings}</dd></div>
           <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Loyalty and referral points</dt><dd className="mt-0.5 font-mono">{customer.points}</dd></div>
           <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Referral code</dt><dd className="mt-0.5 font-mono">{signupProfile.referralCode}</dd></div>
-          <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Marketing consent</dt><dd className="mt-0.5">{signupProfile.marketingOptIn ? "Yes" : "No"}</dd></div>
         </dl>
       </div>
 

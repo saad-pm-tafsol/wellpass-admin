@@ -10,8 +10,7 @@ import { toast } from "sonner";
 type CategoryItem = { id: string; name: string; icon: string };
 
 const DEFAULT_PARTNER_TYPE = "Fitness & Wellness Studio";
-const ADD_TYPE_VALUE = "__add_type__";
-const INITIAL_PARTNER_TYPES = [
+const PARTNER_TYPES = [
   DEFAULT_PARTNER_TYPE,
   "Sports Academy & Club",
   "Gym",
@@ -20,7 +19,6 @@ const INITIAL_PARTNER_TYPES = [
 ];
 
 export default function AdminCategories() {
-  const [partnerTypes, setPartnerTypes] = useState<string[]>(INITIAL_PARTNER_TYPES);
   const [selectedType, setSelectedType] = useState(DEFAULT_PARTNER_TYPE);
   const [categoriesByType, setCategoriesByType] = useState<Record<string, CategoryItem[]>>(() => ({
     [DEFAULT_PARTNER_TYPE]: CATEGORIES.map((c, i) => ({ id: `c${i}`, name: c.name, icon: c.icon })),
@@ -37,9 +35,6 @@ export default function AdminCategories() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formName, setFormName] = useState("");
   const [formIcon, setFormIcon] = useState("");
-
-  const [typeOpen, setTypeOpen] = useState(false);
-  const [typeName, setTypeName] = useState("");
 
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
@@ -89,27 +84,6 @@ export default function AdminCategories() {
     setFormOpen(false);
   };
 
-  const submitType = (e: React.FormEvent) => {
-    e.preventDefault();
-    const name = typeName.trim();
-    if (!name) {
-      toast.error("Type name is required");
-      return;
-    }
-    if (partnerTypes.some((type) => type.toLowerCase() === name.toLowerCase())) {
-      toast.error("Type already exists");
-      return;
-    }
-
-    setPartnerTypes((prev) => [...prev, name]);
-    setCategoriesByType((prev) => ({ ...prev, [name]: [] }));
-    setSelectedType(name);
-    setQuery("");
-    setTypeName("");
-    setTypeOpen(false);
-    toast.success(`"${name}" type added`);
-  };
-
   const confirmDelete = () => {
     if (!deleting) return;
     setCategoriesByType((prev) => ({
@@ -121,11 +95,6 @@ export default function AdminCategories() {
   };
 
   const handleTypeChange = (value: string) => {
-    if (value === ADD_TYPE_VALUE) {
-      setTypeName("");
-      setTypeOpen(true);
-      return;
-    }
     setSelectedType(value);
     setQuery("");
     setDeletingId(null);
@@ -154,10 +123,9 @@ export default function AdminCategories() {
             className="rounded-lg border border-input bg-card px-3 py-2 text-sm min-w-56 focus:outline-none focus:ring-2 focus:ring-ring"
             aria-label="Partner type"
           >
-            {partnerTypes.map((type) => (
+            {PARTNER_TYPES.map((type) => (
               <option key={type} value={type}>{type}</option>
             ))}
-            <option value={ADD_TYPE_VALUE}>+ Add new type</option>
           </select>
           <button onClick={openAdd} className="inline-flex items-center gap-2 rounded-lg bg-primary px-3 py-2 text-sm font-medium text-primary-foreground hover:bg-secondary">
             <Plus className="h-4 w-4" /> Add category
@@ -232,33 +200,6 @@ export default function AdminCategories() {
               className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
             />
             <span className="mt-1 block text-xs text-muted-foreground">Optional. Defaults to #.</span>
-          </label>
-        </form>
-      </Modal>
-
-      <Modal
-        open={typeOpen}
-        onClose={() => setTypeOpen(false)}
-        title="Add partner type"
-        description="Create a new type with its own category list."
-        size="sm"
-        footer={
-          <>
-            <button type="button" onClick={() => setTypeOpen(false)} className="rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-accent">Cancel</button>
-            <button type="submit" form="type-form" className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-secondary">Add type</button>
-          </>
-        }
-      >
-        <form id="type-form" onSubmit={submitType}>
-          <label className="block text-sm">
-            <span className="font-medium">Type name</span>
-            <input
-              value={typeName}
-              onChange={(e) => setTypeName(e.target.value)}
-              placeholder="e.g. Recovery Clinic"
-              autoFocus
-              className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-            />
           </label>
         </form>
       </Modal>
