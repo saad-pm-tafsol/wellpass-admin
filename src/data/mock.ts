@@ -150,9 +150,8 @@ export type Booking = {
   credits?: number;
   amount?: number;
   createdAt: string;
-  // Reason given for a cancellation (by the customer) or a rejection/no-show (by the partner).
-  reason?: string;
-  reasonBy?: "Customer" | "Partner";
+  cancelledBy?: "Customer" | "Partner";
+  cancellationReason?: string;
 };
 
 export const BOOKINGS: Booking[] = [
@@ -163,8 +162,32 @@ export const BOOKINGS: Booking[] = [
   { ref: "WP-2025-04817", customer: "Noura Al-Otaibi", classId: "c5", status: "Confirmed", type: "Credit", credits: 8, createdAt: "2025-06-27 22:30" },
   { ref: "WP-2025-04816", customer: "Sara Al-Hamdan", classId: "c5", status: "Completed", type: "Credit", credits: 8, createdAt: "2025-06-26 17:00" },
   { ref: "WP-2025-04815", customer: "Ahmed Al-Rashidi", classId: "c3", status: "Completed", type: "Credit", credits: 10, createdAt: "2025-06-26 18:00" },
-  { ref: "WP-2025-04814", customer: "Fatima Al-Dosari", classId: "c7", status: "Cancelled", type: "Credit", credits: 6, createdAt: "2025-06-25 08:00", reason: "Feeling unwell — had to cancel last minute.", reasonBy: "Customer" },
-  { ref: "WP-2025-04813", customer: "Khalid Al-Shehri", classId: "c4", status: "Rejected", type: "Independent", amount: 100, createdAt: "2025-06-25 11:20", reason: "Class was fully booked at the requested time slot.", reasonBy: "Partner" },
+  { ref: "WP-2025-04814", customer: "Fatima Al-Dosari", classId: "c7", status: "Cancelled", type: "Credit", credits: 6, createdAt: "2025-06-25 08:00", cancelledBy: "Customer", cancellationReason: "Schedule changed and I can no longer attend." },
+  { ref: "WP-2025-04813", customer: "Khalid Al-Shehri", classId: "c4", status: "Rejected", type: "Independent", amount: 100, createdAt: "2025-06-25 11:20" },
+];
+
+export type ClassDeletionRecord = {
+  id: string;
+  className: string;
+  studioId: string;
+  partner: string;
+  category: Category;
+  instructor: string;
+  deletedAt: string;
+  reason?: string;
+};
+
+export const CLASS_DELETION_RECORDS: ClassDeletionRecord[] = [
+  {
+    id: "del-c2",
+    className: "Power Pilates Core",
+    studioId: "zenith",
+    partner: "Zenith Pilates Partner",
+    category: "Pilates",
+    instructor: "Mariam Khalid",
+    deletedAt: "2025-06-29 14:35",
+    reason: "Class schedule is being rebuilt for the new instructor roster.",
+  },
 ];
 
 export const CURRENT_CUSTOMER = {

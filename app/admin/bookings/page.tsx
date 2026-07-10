@@ -162,6 +162,15 @@ export default function AdminBookings() {
               <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Instructor</dt><dd className="mt-0.5">{selected.cls.instructor}</dd></div>
               <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">When</dt><dd className="mt-0.5">{selected.cls.day} · {selected.cls.time} · {selected.cls.duration} min</dd></div>
               <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Payment type</dt><dd className="mt-0.5">{selected.booking.type}</dd></div>
+              {selected.booking.cancelledBy && (
+                <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Cancelled by</dt><dd className="mt-0.5">{selected.booking.cancelledBy}</dd></div>
+              )}
+              {selected.booking.cancellationReason && (
+                <div className="col-span-2 rounded-xl border border-destructive/20 bg-destructive/5 p-3">
+                  <dt className="text-xs uppercase tracking-wider text-muted-foreground">Cancellation reason</dt>
+                  <dd className="mt-1 text-sm">{selected.booking.cancellationReason}</dd>
+                </div>
+              )}
               <div>
                 <dt className="text-xs uppercase tracking-wider text-muted-foreground">Cost</dt>
                 <dd className="mt-0.5 font-mono">{selected.booking.type === "Credit" ? `${selected.booking.credits ?? 0} credits` : `SAR ${(selected.booking.amount ?? 0).toFixed(0)}`}</dd>
