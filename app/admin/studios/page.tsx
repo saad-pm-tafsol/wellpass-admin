@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { STUDIOS } from "@/data/mock";
+import { CLASS_DELETION_RECORDS, STUDIOS } from "@/data/mock";
 import { useAccounts } from "@/store/accounts";
 import { StatusBadge } from "@/components/wp/StatusBadge";
 import { Search } from "lucide-react";
@@ -140,6 +140,47 @@ export default function AdminStudios() {
           </table>
         </div>
       )}
+
+      <div className="bg-card border border-border rounded-xl overflow-x-auto">
+        <div className="p-5 pb-3">
+          <h3 className="font-semibold">Class deletion records</h3>
+          <p className="mt-1 text-sm text-muted-foreground">Partner-submitted class deletions and optional reasons.</p>
+        </div>
+        <table className="w-full text-sm">
+          <thead className="bg-accent/50 text-xs uppercase tracking-wider text-muted-foreground">
+            <tr>
+              <th className="text-left px-4 py-3">Class</th>
+              <th className="text-left px-4 py-3">Partner</th>
+              <th className="text-left px-4 py-3">Instructor</th>
+              <th className="text-left px-4 py-3">Deleted</th>
+              <th className="text-left px-4 py-3">Reason</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-border">
+            {CLASS_DELETION_RECORDS.map((record) => (
+              <tr key={record.id} className="hover:bg-accent/30 align-top">
+                <td className="px-4 py-3">
+                  <div className="font-medium">{record.className}</div>
+                  <div className="text-xs text-muted-foreground">{record.category}</div>
+                </td>
+                <td className="px-4 py-3">
+                  <Link href={`/admin/studios/${record.studioId}`} className="font-medium text-primary hover:text-secondary hover:underline">
+                    {record.partner}
+                  </Link>
+                </td>
+                <td className="px-4 py-3 text-muted-foreground">{record.instructor}</td>
+                <td className="px-4 py-3 text-xs text-muted-foreground">{record.deletedAt}</td>
+                <td className="px-4 py-3 max-w-md text-muted-foreground">{record.reason || "No reason provided"}</td>
+              </tr>
+            ))}
+            {CLASS_DELETION_RECORDS.length === 0 && (
+              <tr>
+                <td colSpan={5} className="px-4 py-8 text-center text-sm text-muted-foreground">No class deletions recorded.</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
 
       <div className="bg-card border border-border rounded-xl overflow-x-auto">
         <table className="w-full text-sm">
