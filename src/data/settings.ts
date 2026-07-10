@@ -7,8 +7,11 @@ export const CREDIT_AMOUNT = 1;
 /** SAR value of the default credit quantity. 1 credit = SAR 2.00 by default. */
 export const CREDIT_VALUE_SAR = 2;
 
-/** Platform commission kept on each booking, as a percentage. */
+/** Platform commission kept on each (ongoing/daily) booking, as a percentage. */
 export const PLATFORM_COMMISSION_PCT = 15;
+
+/** Additional commission the platform takes on a customer's first booking, as a percentage. */
+export const FIRST_BOOKING_COMMISSION_PCT = 5;
 
 /** Gross SAR a credit-based class is worth at the given conversion rate. */
 export function creditsToSar(

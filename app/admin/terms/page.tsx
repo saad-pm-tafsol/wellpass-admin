@@ -6,7 +6,9 @@ import { FileText, ShieldCheck, Save } from "lucide-react";
 import { toast } from "sonner";
 
 const DEFAULTS = {
-  customerTerms: `WellPass — Customer Terms of Service
+  customer: `WellPass — Customer Terms & Privacy
+
+== Terms of Service ==
 
 1. Acceptance of Terms
 By creating an account or booking a class through WellPass, you agree to these Customer Terms of Service.
@@ -21,8 +23,9 @@ Bookings may be cancelled up to the partner's stated cancellation window. Late c
 Customers are responsible for providing accurate account details and for attending or cancelling bookings in a timely manner.
 
 5. Changes to These Terms
-WellPass may update these Terms from time to time. Continued use of the platform constitutes acceptance of the updated Terms.`,
-  customerPrivacy: `WellPass — Customer Privacy Policy
+WellPass may update these Terms from time to time. Continued use of the platform constitutes acceptance of the updated Terms.
+
+== Privacy Policy ==
 
 1. Information We Collect
 We collect account details (name, email, phone), booking activity and payment information needed to operate the service.
@@ -38,7 +41,9 @@ We retain your data for as long as your account is active and as required by app
 
 5. Your Rights
 You may request access to, correction of, or deletion of your personal data by contacting support.`,
-  partnerTerms: `WellPass — Partner Terms of Service
+  partner: `WellPass — Partner Terms & Privacy
+
+== Terms of Service ==
 
 1. Partnership Agreement
 Partners agree to provide accurate class listings, schedules, instructor details and available capacity through WellPass.
@@ -53,8 +58,9 @@ Partners must manage no-shows, cancellations and customer disputes according to 
 Partners are responsible for maintaining required licenses, safety standards, and legal compliance on their premises.
 
 5. Termination
-WellPass may suspend or terminate a partner relationship if the partner repeatedly breaches platform rules or service expectations.`,
-  partnerPrivacy: `WellPass — Partner Privacy Policy
+WellPass may suspend or terminate a partner relationship if the partner repeatedly breaches platform rules or service expectations.
+
+== Privacy Policy ==
 
 1. Information We Collect
 We collect partner owner details, business information, booking and payout data, and operational information needed to manage the partnership.
@@ -75,14 +81,12 @@ You may request access to, correction of, or deletion of your business informati
 type DocKey = keyof typeof DEFAULTS;
 
 const TABS: { key: DocKey; label: string; icon: typeof FileText }[] = [
-  { key: "customerTerms", label: "Customer Terms", icon: FileText },
-  { key: "customerPrivacy", label: "Customer Privacy", icon: ShieldCheck },
-  { key: "partnerTerms", label: "Partner Terms", icon: FileText },
-  { key: "partnerPrivacy", label: "Partner Privacy", icon: ShieldCheck },
+  { key: "customer", label: "Customer Terms & Privacy", icon: FileText },
+  { key: "partner", label: "Partner Terms & Privacy", icon: ShieldCheck },
 ];
 
 export default function AdminTerms() {
-  const [active, setActive] = useState<DocKey>("customerTerms");
+  const [active, setActive] = useState<DocKey>("customer");
   const [docs, setDocs] = useState<Record<DocKey, string>>(DEFAULTS);
 
   const activeLabel = TABS.find((t) => t.key === active)!.label;

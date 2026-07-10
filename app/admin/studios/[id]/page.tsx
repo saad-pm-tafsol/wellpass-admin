@@ -6,7 +6,7 @@ import { STUDIOS } from "@/data/mock";
 import { useAccounts } from "@/store/accounts";
 import { ApplicationDetailsCard } from "@/components/wp/ApplicationDetailsCard";
 import { StatusBadge } from "@/components/wp/StatusBadge";
-import { ArrowLeft, CalendarClock, Mail, MapPin, Phone, Play, Snowflake, User } from "lucide-react";
+import { ArrowLeft, Ban, CalendarClock, Mail, MapPin, Phone, Play, User } from "lucide-react";
 import { toast } from "sonner";
 
 export default function StudioDetail() {
@@ -30,7 +30,7 @@ export default function StudioDetail() {
 
   const onToggle = () => {
     const next = toggleStudio(studio.id);
-    toast.success(`${studio.name} ${next === "Frozen" ? "frozen" : "reactivated"}`);
+    toast.success(`${studio.name} ${next === "Blocked" ? "blocked" : "unblocked"}`);
   };
 
   return (
@@ -50,18 +50,18 @@ export default function StudioDetail() {
         <button
           onClick={onToggle}
           className={
-            status === "Frozen"
+            status === "Blocked"
               ? "inline-flex items-center gap-2 rounded-lg bg-success px-4 py-2 text-sm font-medium text-white hover:bg-success/80"
               : "inline-flex items-center gap-2 rounded-lg bg-destructive/15 px-4 py-2 text-sm font-medium text-destructive hover:bg-destructive/25"
           }
         >
-          {status === "Frozen" ? (
+          {status === "Blocked" ? (
             <>
-              <Play className="h-4 w-4" /> Reactivate account
+              <Play className="h-4 w-4" /> Unblock account
             </>
           ) : (
             <>
-              <Snowflake className="h-4 w-4" /> Freeze account
+              <Ban className="h-4 w-4" /> Block account
             </>
           )}
         </button>

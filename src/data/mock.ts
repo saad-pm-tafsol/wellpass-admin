@@ -104,11 +104,11 @@ export const PENDING_STUDIOS: PendingStudio[] = [
     amenities: ["Showers", "Wi-Fi", "Prayer Room", "Café"], submittedAt: "2025-07-01" },
 ];
 
-export type Plan = { id: string; name: string; credits: number; price: number; validityMonths: number; popular?: boolean };
+export type Plan = { id: string; name: string; credits: number; price: number; validityMonths: number; popular?: boolean; features?: string[] };
 export const PLANS: Plan[] = [
-  { id: "starter", name: "Starter Pack", credits: 50, price: 149, validityMonths: 1 },
-  { id: "active", name: "Active Pack", credits: 100, price: 249, validityMonths: 2, popular: true },
-  { id: "elite", name: "Elite Pack", credits: 150, price: 349, validityMonths: 3 },
+  { id: "starter", name: "Starter Pack", credits: 50, price: 149, validityMonths: 1, features: ["Access to all partner studios", "Book up to 3 classes per day"] },
+  { id: "active", name: "Active Pack", credits: 100, price: 249, validityMonths: 2, popular: true, features: ["Access to all partner studios", "Priority booking window", "Free class cancellations"] },
+  { id: "elite", name: "Elite Pack", credits: 150, price: 349, validityMonths: 3, features: ["Access to all partner studios", "Priority booking window", "Free class cancellations", "Exclusive premium classes"] },
 ];
 
 export type ClassItem = {
@@ -150,6 +150,9 @@ export type Booking = {
   credits?: number;
   amount?: number;
   createdAt: string;
+  // Reason given for a cancellation (by the customer) or a rejection/no-show (by the partner).
+  reason?: string;
+  reasonBy?: "Customer" | "Partner";
 };
 
 export const BOOKINGS: Booking[] = [
@@ -160,8 +163,8 @@ export const BOOKINGS: Booking[] = [
   { ref: "WP-2025-04817", customer: "Noura Al-Otaibi", classId: "c5", status: "Confirmed", type: "Credit", credits: 8, createdAt: "2025-06-27 22:30" },
   { ref: "WP-2025-04816", customer: "Sara Al-Hamdan", classId: "c5", status: "Completed", type: "Credit", credits: 8, createdAt: "2025-06-26 17:00" },
   { ref: "WP-2025-04815", customer: "Ahmed Al-Rashidi", classId: "c3", status: "Completed", type: "Credit", credits: 10, createdAt: "2025-06-26 18:00" },
-  { ref: "WP-2025-04814", customer: "Fatima Al-Dosari", classId: "c7", status: "Cancelled", type: "Credit", credits: 6, createdAt: "2025-06-25 08:00" },
-  { ref: "WP-2025-04813", customer: "Khalid Al-Shehri", classId: "c4", status: "Rejected", type: "Independent", amount: 100, createdAt: "2025-06-25 11:20" },
+  { ref: "WP-2025-04814", customer: "Fatima Al-Dosari", classId: "c7", status: "Cancelled", type: "Credit", credits: 6, createdAt: "2025-06-25 08:00", reason: "Feeling unwell — had to cancel last minute.", reasonBy: "Customer" },
+  { ref: "WP-2025-04813", customer: "Khalid Al-Shehri", classId: "c4", status: "Rejected", type: "Independent", amount: 100, createdAt: "2025-06-25 11:20", reason: "Class was fully booked at the requested time slot.", reasonBy: "Partner" },
 ];
 
 export const CURRENT_CUSTOMER = {
@@ -179,12 +182,26 @@ export const CURRENT_CUSTOMER = {
 };
 
 export const CUSTOMERS = [
-  { name: "Sara Al-Hamdan", email: "sara@example.com", phone: "+966 50 884 2190", dateOfBirth: "1993-04-18", gender: "Female", nationality: "Saudi", city: "Riyadh", preferredLanguage: "English", joinedAt: "2025-01-12", referralCode: "SARA2025", marketingOptIn: true, plan: "Active Pack", credits: 78, bookings: 12, points: 340, status: "Active" },
-  { name: "Ahmed Al-Rashidi", email: "ahmed@example.com", phone: "+966 55 129 7740", dateOfBirth: "1988-11-03", gender: "Male", nationality: "Saudi", city: "Riyadh", preferredLanguage: "Arabic", joinedAt: "2024-12-04", referralCode: "AHMED2025", marketingOptIn: true, plan: "Elite Pack", credits: 132, bookings: 28, points: 890, status: "Active" },
-  { name: "Noura Al-Otaibi", email: "noura@example.com", phone: "+966 56 440 1182", dateOfBirth: "1997-07-26", gender: "Female", nationality: "Saudi", city: "Jeddah", preferredLanguage: "Arabic", joinedAt: "2025-03-19", referralCode: "NOURA2025", marketingOptIn: false, plan: "Starter Pack", credits: 22, bookings: 5, points: 120, status: "Frozen" },
-  { name: "Khalid Al-Shehri", email: "khalid@example.com", plan: "—", credits: 0, bookings: 3, points: 60, status: "Active" },
-  { name: "Fatima Al-Dosari", email: "fatima@example.com", phone: "+966 53 226 5801", dateOfBirth: "1995-09-09", gender: "Female", nationality: "Saudi", city: "Al Khobar", preferredLanguage: "Arabic", joinedAt: "2025-02-22", referralCode: "FATIMA2025", marketingOptIn: true, plan: "Active Pack", credits: 95, bookings: 9, points: 270, status: "Active" },
+  { name: "Sara Al-Hamdan", email: "sara@example.com", phone: "+966 50 884 2190", dateOfBirth: "1993-04-18", gender: "Female", nationality: "Saudi", city: "Riyadh", preferredLanguage: "English", joinedAt: "2025-01-12", referralCode: "SARA2025", marketingOptIn: true, plan: "Active Pack", credits: 78, bookings: 12, points: 340, status: "Active", lastBooking: "2026-06-28" },
+  { name: "Ahmed Al-Rashidi", email: "ahmed@example.com", phone: "+966 55 129 7740", dateOfBirth: "1988-11-03", gender: "Male", nationality: "Saudi", city: "Riyadh", preferredLanguage: "Arabic", joinedAt: "2024-12-04", referralCode: "AHMED2025", marketingOptIn: true, plan: "Elite Pack", credits: 132, bookings: 28, points: 890, status: "Active", lastBooking: "2026-06-12" },
+  { name: "Noura Al-Otaibi", email: "noura@example.com", phone: "+966 56 440 1182", dateOfBirth: "1997-07-26", gender: "Female", nationality: "Saudi", city: "Jeddah", preferredLanguage: "Arabic", joinedAt: "2025-03-19", referralCode: "NOURA2025", marketingOptIn: false, plan: "Starter Pack", credits: 22, bookings: 5, points: 120, status: "Blocked", lastBooking: "2026-02-25" },
+  { name: "Khalid Al-Shehri", email: "khalid@example.com", plan: "—", credits: 0, bookings: 3, points: 60, status: "Active", lastBooking: "2026-02-18" },
+  { name: "Fatima Al-Dosari", email: "fatima@example.com", phone: "+966 53 226 5801", dateOfBirth: "1995-09-09", gender: "Female", nationality: "Saudi", city: "Al Khobar", preferredLanguage: "Arabic", joinedAt: "2025-02-22", referralCode: "FATIMA2025", marketingOptIn: true, plan: "Active Pack", credits: 95, bookings: 9, points: 270, status: "Active", lastBooking: "2026-03-01" },
 ];
+
+// A customer is "Non-active" if their most recent booking is more than 4 months
+// old. A manually Blocked account always shows as Blocked regardless of activity.
+export function isCustomerNonActive(lastBooking: string): boolean {
+  const last = new Date(`${lastBooking}T00:00:00`);
+  const cutoff = new Date();
+  cutoff.setMonth(cutoff.getMonth() - 4);
+  return last < cutoff;
+}
+
+export function customerDisplayStatus(accountStatus: string, lastBooking: string): "Active" | "Non-active" | "Blocked" {
+  if (accountStatus === "Blocked") return "Blocked";
+  return isCustomerNonActive(lastBooking) ? "Non-active" : "Active";
+}
 
 export type LoyaltyHistoryEntry = {
   id: string;
@@ -204,6 +221,26 @@ export const LOYALTY_HISTORY: LoyaltyHistoryEntry[] = [
   { id: "lh-6", customerEmail: "noura@example.com", points: 12, earnedAt: "2026-03-05", source: "Class attendance", reason: "Joined a guided meditation session" },
   { id: "lh-7", customerEmail: "khalid@example.com", points: 8, earnedAt: "2026-05-20", source: "Promotion", reason: "App onboarding reward" },
   { id: "lh-8", customerEmail: "fatima@example.com", points: 18, earnedAt: "2026-04-08", source: "Membership bonus", reason: "Loyalty reward for active plan" },
+];
+
+// Where loyalty points were spent: each redemption is tied to the booking the
+// points were applied to, so the history page can show earning vs. usage.
+export type LoyaltyRedemption = {
+  id: string;
+  customerEmail: string;
+  points: number;
+  redeemedAt: string;
+  bookingRef: string;
+  classId: string;
+};
+
+export const LOYALTY_REDEMPTIONS: LoyaltyRedemption[] = [
+  { id: "lr-1", customerEmail: "sara@example.com", points: 20, redeemedAt: "2026-03-02", bookingRef: "WP-2025-04821", classId: "c2" },
+  { id: "lr-2", customerEmail: "sara@example.com", points: 15, redeemedAt: "2026-06-28", bookingRef: "WP-2025-04816", classId: "c5" },
+  { id: "lr-3", customerEmail: "ahmed@example.com", points: 30, redeemedAt: "2026-03-15", bookingRef: "WP-2025-04820", classId: "c6" },
+  { id: "lr-4", customerEmail: "ahmed@example.com", points: 20, redeemedAt: "2026-06-25", bookingRef: "WP-2025-04815", classId: "c3" },
+  { id: "lr-5", customerEmail: "noura@example.com", points: 10, redeemedAt: "2026-05-10", bookingRef: "WP-2025-04817", classId: "c5" },
+  { id: "lr-6", customerEmail: "fatima@example.com", points: 12, redeemedAt: "2026-05-22", bookingRef: "WP-2025-04814", classId: "c7" },
 ];
 
 export function getLoyaltyExpiryDate(earnedAt: string) {
@@ -227,22 +264,23 @@ export function classById(id: string) {
   return CLASSES.find((c) => c.id === id);
 }
 
+// Revenue by source: independent bookings + membership package sales + partner
+// subscription fees (studios paying to be listed on the platform).
 export const REVENUE_WEEKLY = [
-  { week: "W1", membership: 2400, independent: 1200 }, { week: "W2", membership: 2600, independent: 1400 },
-  { week: "W3", membership: 2800, independent: 1500 }, { week: "W4", membership: 3000, independent: 1600 },
+  { week: "W1", membership: 2400, independent: 1200, subscription: 600 }, { week: "W2", membership: 2600, independent: 1400, subscription: 650 },
+  { week: "W3", membership: 2800, independent: 1500, subscription: 700 }, { week: "W4", membership: 3000, independent: 1600, subscription: 750 },
 ];
-// Monthly revenue by source: independent bookings + membership package sales.
 export const REVENUE_MONTHLY = [
-  { month: "Jan", membership: 2400, independent: 1800 }, { month: "Feb", membership: 2700, independent: 2100 },
-  { month: "Mar", membership: 3000, independent: 2400 }, { month: "Apr", membership: 3400, independent: 2700 },
-  { month: "May", membership: 3800, independent: 3100 }, { month: "Jun", membership: 4200, independent: 3500 },
-  { month: "Jul", membership: 4600, independent: 3900 }, { month: "Aug", membership: 5000, independent: 4300 },
-  { month: "Sep", membership: 5400, independent: 4700 }, { month: "Oct", membership: 5800, independent: 5100 },
-  { month: "Nov", membership: 6200, independent: 5500 }, { month: "Dec", membership: 6600, independent: 5900 },
+  { month: "Jan", membership: 2400, independent: 1800, subscription: 1800 }, { month: "Feb", membership: 2700, independent: 2100, subscription: 1950 },
+  { month: "Mar", membership: 3000, independent: 2400, subscription: 2100 }, { month: "Apr", membership: 3400, independent: 2700, subscription: 2300 },
+  { month: "May", membership: 3800, independent: 3100, subscription: 2500 }, { month: "Jun", membership: 4200, independent: 3500, subscription: 2700 },
+  { month: "Jul", membership: 4600, independent: 3900, subscription: 2900 }, { month: "Aug", membership: 5000, independent: 4300, subscription: 3100 },
+  { month: "Sep", membership: 5400, independent: 4700, subscription: 3300 }, { month: "Oct", membership: 5800, independent: 5100, subscription: 3600 },
+  { month: "Nov", membership: 6200, independent: 5500, subscription: 3900 }, { month: "Dec", membership: 6600, independent: 5900, subscription: 4200 },
 ];
 export const REVENUE_YEARLY = [
-  { year: "2021", membership: 28000, independent: 21000 }, { year: "2022", membership: 32000, independent: 24000 },
-  { year: "2023", membership: 36000, independent: 27000 }, { year: "2024", membership: 40000, independent: 30000 }, { year: "2025", membership: 44000, independent: 33000 },
+  { year: "2021", membership: 28000, independent: 21000, subscription: 18000 }, { year: "2022", membership: 32000, independent: 24000, subscription: 21000 },
+  { year: "2023", membership: 36000, independent: 27000, subscription: 24000 }, { year: "2024", membership: 40000, independent: 30000, subscription: 28000 }, { year: "2025", membership: 44000, independent: 33000, subscription: 32000 },
 ];
 export const REGISTRATION_TRENDS = {
   weekly: [

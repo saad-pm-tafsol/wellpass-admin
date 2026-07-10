@@ -3,7 +3,7 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 import { STUDIOS, CUSTOMERS, PENDING_STUDIOS, type PendingStudio } from "@/data/mock";
 
-export type AccountStatus = "Active" | "Frozen";
+export type AccountStatus = "Active" | "Blocked";
 
 type AccountsState = {
   studioStatus: Record<string, AccountStatus>;
@@ -42,13 +42,13 @@ export function AccountsProvider({ children }: { children: ReactNode }) {
   const [pendingStudios, setPendingStudios] = useState<PendingStudio[]>(PENDING_STUDIOS);
 
   const toggleStudio = (id: string): AccountStatus => {
-    const next: AccountStatus = (studioStatus[id] ?? "Active") === "Frozen" ? "Active" : "Frozen";
+    const next: AccountStatus = (studioStatus[id] ?? "Active") === "Blocked" ? "Active" : "Blocked";
     setStudioStatus((prev) => ({ ...prev, [id]: next }));
     return next;
   };
 
   const toggleCustomer = (email: string): AccountStatus => {
-    const next: AccountStatus = (customerStatus[email] ?? "Active") === "Frozen" ? "Active" : "Frozen";
+    const next: AccountStatus = (customerStatus[email] ?? "Active") === "Blocked" ? "Active" : "Blocked";
     setCustomerStatus((prev) => ({ ...prev, [email]: next }));
     return next;
   };

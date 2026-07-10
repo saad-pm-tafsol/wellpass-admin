@@ -10,7 +10,8 @@ const styles: Record<string, string> = {
   Inactive: "bg-destructive/15 text-destructive border border-destructive/30",
   Completed: "bg-primary/15 text-primary border border-primary/30",
   Attended: "bg-primary/15 text-primary border border-primary/30",
-  Frozen: "bg-slate-200 text-slate-700 border border-slate-300",
+  Blocked: "bg-destructive/15 text-destructive border border-destructive/30",
+  "Non-active": "bg-slate-200 text-slate-700 border border-slate-300",
   "No-Show": "bg-zinc-700 text-white border border-zinc-800",
 };
 

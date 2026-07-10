@@ -169,6 +169,14 @@ export default function AdminBookings() {
               <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Value (SAR)</dt><dd className="mt-0.5 font-mono">SAR {selected.sar.toFixed(2)}</dd></div>
               <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Platform commission</dt><dd className="mt-0.5 font-mono text-success-foreground">{selected.commission > 0 ? `+SAR ${selected.commission.toFixed(2)}` : "—"}</dd></div>
             </dl>
+            {selected.booking.reason && (
+              <div className="rounded-lg border border-border bg-accent/30 p-4">
+                <dt className="text-xs uppercase tracking-wider text-muted-foreground">
+                  {selected.booking.reasonBy === "Partner" ? "Partner's reason" : "Customer's reason"} · {selected.booking.status}
+                </dt>
+                <dd className="mt-1 text-sm">{selected.booking.reason}</dd>
+              </div>
+            )}
           </div>
         )}
       </Modal>

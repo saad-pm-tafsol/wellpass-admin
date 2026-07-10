@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { ArrowLeft, CalendarClock, Gift, Sparkles } from "lucide-react";
-import { CUSTOMERS, LOYALTY_HISTORY, getLoyaltyExpiryDate, getLoyaltyStatus } from "@/data/mock";
+import { CUSTOMERS, LOYALTY_HISTORY, LOYALTY_REDEMPTIONS, classById, getLoyaltyExpiryDate, getLoyaltyStatus } from "@/data/mock";
 
 function formatDate(value: Date) {
   return value.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
@@ -26,6 +26,8 @@ export default function LoyaltyHistoryPage() {
   }
 
   const entries = LOYALTY_HISTORY.filter((entry) => entry.customerEmail === customer.email).sort((a, b) => (a.earnedAt < b.earnedAt ? 1 : -1));
+  const redemptions = LOYALTY_REDEMPTIONS.filter((entry) => entry.customerEmail === customer.email).sort((a, b) => (a.redeemedAt < b.redeemedAt ? 1 : -1));
+  const pointsRedeemed = redemptions.reduce((sum, entry) => sum + entry.points, 0);
 
   return (
     <div className="space-y-6">
@@ -68,38 +70,77 @@ export default function LoyaltyHistoryPage() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-card overflow-hidden">
-        <div className="border-b border-border px-5 py-4">
-          <h3 className="font-semibold">Point history</h3>
-        </div>
-        {entries.length === 0 ? (
-          <p className="px-5 py-8 text-sm text-muted-foreground">No loyalty history available for this customer.</p>
-        ) : (
-          <div className="divide-y divide-border">
-            {entries.map((entry) => {
-              const expiry = getLoyaltyExpiryDate(entry.earnedAt);
-              const status = getLoyaltyStatus(entry.earnedAt);
-              return (
-                <div key={entry.id} className="flex flex-col gap-3 px-5 py-4 md:flex-row md:items-center md:justify-between">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold">+{entry.points} points</span>
-                      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${status === "Expired" ? "bg-destructive/15 text-destructive" : "bg-success/15 text-success"}`}>
-                        {status}
-                      </span>
-                    </div>
-                    <p className="mt-1 text-sm text-muted-foreground">{entry.reason}</p>
-                    <div className="mt-1 text-xs uppercase tracking-wider text-muted-foreground">Source: {entry.source}</div>
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    <div>Earned on {formatDate(new Date(`${entry.earnedAt}T00:00:00`))}</div>
-                    <div className="mt-1">Expires on {formatDate(expiry)}</div>
-                  </div>
-                </div>
-              );
-            })}
+      <div className="grid gap-6 lg:grid-cols-2">
+        <div className="rounded-xl border border-border bg-card overflow-hidden">
+          <div className="border-b border-border px-5 py-4">
+            <h3 className="font-semibold">Point history</h3>
+            <p className="mt-0.5 text-sm text-muted-foreground">Points earned over time</p>
           </div>
-        )}
+          {entries.length === 0 ? (
+            <p className="px-5 py-8 text-sm text-muted-foreground">No loyalty history available for this customer.</p>
+          ) : (
+            <div className="divide-y divide-border">
+              {entries.map((entry) => {
+                const expiry = getLoyaltyExpiryDate(entry.earnedAt);
+                const status = getLoyaltyStatus(entry.earnedAt);
+                return (
+                  <div key={entry.id} className="flex flex-col gap-3 px-5 py-4 md:flex-row md:items-center md:justify-between">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold">+{entry.points} points</span>
+                        <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${status === "Expired" ? "bg-destructive/15 text-destructive" : "bg-success/15 text-success"}`}>
+                          {status}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-sm text-muted-foreground">{entry.reason}</p>
+                      <div className="mt-1 text-xs uppercase tracking-wider text-muted-foreground">Source: {entry.source}</div>
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      <div>Earned on {formatDate(new Date(`${entry.earnedAt}T00:00:00`))}</div>
+                      <div className="mt-1">Expires on {formatDate(expiry)}</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        <div className="rounded-xl border border-border bg-card overflow-hidden">
+          <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-4">
+            <div>
+              <h3 className="font-semibold">Points used</h3>
+              <p className="mt-0.5 text-sm text-muted-foreground">Redemptions applied to bookings</p>
+            </div>
+            {redemptions.length > 0 && (
+              <div className="text-right">
+                <div className="font-mono text-lg font-semibold text-destructive">−{pointsRedeemed}</div>
+                <div className="text-xs uppercase tracking-wider text-muted-foreground">Points spent</div>
+              </div>
+            )}
+          </div>
+          {redemptions.length === 0 ? (
+            <p className="px-5 py-8 text-sm text-muted-foreground">No points redeemed by this customer yet.</p>
+          ) : (
+            <div className="divide-y divide-border">
+              {redemptions.map((entry) => {
+                const booked = classById(entry.classId);
+                return (
+                  <div key={entry.id} className="flex flex-col gap-3 px-5 py-4 md:flex-row md:items-center md:justify-between">
+                    <div>
+                      <span className="font-semibold text-destructive">−{entry.points} points</span>
+                      <p className="mt-1 text-sm text-muted-foreground">{booked ? booked.name : "Class booking"}</p>
+                      <div className="mt-1 text-xs uppercase tracking-wider text-muted-foreground">Booking {entry.bookingRef}</div>
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      <div>Used on {formatDate(new Date(`${entry.redeemedAt}T00:00:00`))}</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

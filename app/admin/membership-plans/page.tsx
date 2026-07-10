@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { planValidityMap } from "@/lib/membership-plans";
 import { fetchPlanValidity, savePlanValidity } from "@/lib/content-client";
 
-type Plan = { id: string; name: string; credits: number; price: number; validityMonths: number; popular?: boolean };
+type Plan = { id: string; name: string; credits: number; price: number; validityMonths: number; popular?: boolean; features?: string[] };
 
 export default function AdminMembershipPlans() {
   const [plans, setPlans] = useState<Plan[]>(PLANS);
@@ -38,6 +38,7 @@ export default function AdminMembershipPlans() {
   const [price, setPrice] = useState<number>(0);
   const [validityMonths, setValidityMonths] = useState<number>(1);
   const [popular, setPopular] = useState(false);
+  const [featuresText, setFeaturesText] = useState("");
 
   const openCreate = () => {
     setEditingId(null);
@@ -46,6 +47,7 @@ export default function AdminMembershipPlans() {
     setPrice(0);
     setValidityMonths(1);
     setPopular(false);
+    setFeaturesText("");
     setOpen(true);
   };
 
@@ -56,6 +58,7 @@ export default function AdminMembershipPlans() {
     setPrice(p.price);
     setValidityMonths(p.validityMonths);
     setPopular(Boolean(p.popular));
+    setFeaturesText((p.features ?? []).join("\n"));
     setOpen(true);
   };
 
@@ -65,10 +68,14 @@ export default function AdminMembershipPlans() {
     if (!trimmed) return toast.error("Plan name is required");
     if (credits <= 0 || price <= 0 || validityMonths <= 0) return toast.error("Credits, price, and validity must be greater than zero");
 
+    // One bullet per line, trimmed and blank lines dropped — same convention as FAQ steps.
+    const features = featuresText.split("\n").map((s) => s.trim()).filter(Boolean);
     const cleared = popular ? plans.map((p) => ({ ...p, popular: false })) : plans;
+    // Always set `features` explicitly (undefined when empty) so clearing them on edit overwrites the old list.
+    const draft = { name: trimmed, credits, price, validityMonths, popular, features: features.length ? features : undefined };
     const next = editingId
-      ? cleared.map((p) => (p.id === editingId ? { ...p, name: trimmed, credits, price, validityMonths, popular } : p))
-      : [...cleared, { id: `p${nextId.current++}`, name: trimmed, credits, price, validityMonths, popular }];
+      ? cleared.map((p) => (p.id === editingId ? { ...p, ...draft } : p))
+      : [...cleared, { id: `p${nextId.current++}`, ...draft }];
     persist(next);
     toast.success(editingId ? `"${trimmed}" updated` : `"${trimmed}" created`);
     setOpen(false);
@@ -113,6 +120,9 @@ export default function AdminMembershipPlans() {
               <ul className="mt-4 space-y-2 text-sm">
                 <li className="flex items-center gap-2"><Check className="h-4 w-4 text-success-foreground" /> {p.credits} booking credits</li>
                 <li className="flex items-center gap-2"><Check className="h-4 w-4 text-success-foreground" /> Valid for {p.validityMonths} {p.validityMonths === 1 ? "month" : "months"}</li>
+                {p.features?.map((feature) => (
+                  <li key={feature} className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-success-foreground" /> {feature}</li>
+                ))}
               </ul>
               <div className="mt-5 flex gap-2">
                 <button onClick={() => openEdit(p)} className="flex-1 rounded-lg border border-border px-3 py-2 text-sm font-medium hover:bg-accent">Edit</button>
@@ -178,6 +188,17 @@ export default function AdminMembershipPlans() {
               />
             </label>
           </div>
+          <label className="block text-sm">
+            <span className="font-medium">Features <span className="text-muted-foreground font-normal">(optional — one per line)</span></span>
+            <textarea
+              value={featuresText}
+              onChange={(e) => setFeaturesText(e.target.value)}
+              rows={4}
+              placeholder={"Access to all partner studios\nPriority booking window"}
+              className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-ring resize-y"
+            />
+            <span className="mt-1 block text-xs text-muted-foreground">Each line becomes a bullet point on the plan card, below credits and validity.</span>
+          </label>
           <label className="flex items-center gap-2 text-sm">
             <input type="checkbox" checked={popular} onChange={(e) => setPopular(e.target.checked)} className="h-4 w-4 rounded border-input accent-primary" />
             <span className="font-medium">Mark as Most popular</span>

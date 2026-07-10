@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
-import { CUSTOMERS, BOOKINGS } from "@/data/mock";
+import { CUSTOMERS, BOOKINGS, customerDisplayStatus } from "@/data/mock";
 import { useAccounts } from "@/store/accounts";
 import { Kpi } from "@/components/wp/Kpi";
 import { StatusBadge } from "@/components/wp/StatusBadge";
-import { ArrowLeft, Mail, Snowflake, Play } from "lucide-react";
+import { ArrowLeft, Mail, Ban, Play } from "lucide-react";
 import { toast } from "sonner";
 
 const RECENT_BOOKING_LIMIT = 3;
@@ -83,6 +83,7 @@ export default function CustomerDetail() {
   }
 
   const status = customerStatus[customer.email] ?? customer.status;
+  const displayStatus = customerDisplayStatus(status, customer.lastBooking);
   const signupProfile = SIGNUP_PROFILES[customer.email];
   const bookings = BOOKINGS.filter((b) => b.customer === customer.name);
   const visibleBookings = showAllBookings ? bookings : bookings.slice(0, RECENT_BOOKING_LIMIT);
@@ -90,7 +91,7 @@ export default function CustomerDetail() {
 
   const onToggle = () => {
     const next = toggleCustomer(customer.email);
-    toast.success(`${customer.name} ${next === "Frozen" ? "frozen" : "reactivated"}`);
+    toast.success(`${customer.name} ${next === "Blocked" ? "blocked" : "unblocked"}`);
   };
 
   return (
@@ -103,19 +104,19 @@ export default function CustomerDetail() {
         <div>
           <div className="flex items-center gap-3">
             <h2 className="text-2xl font-bold tracking-tight">{customer.name}</h2>
-            <StatusBadge status={status} />
+            <StatusBadge status={displayStatus} />
           </div>
           <p className="mt-1 inline-flex items-center gap-1.5 text-sm text-muted-foreground"><Mail className="h-4 w-4" /> {customer.email}</p>
         </div>
         <button
           onClick={onToggle}
           className={
-            status === "Frozen"
+            status === "Blocked"
               ? "inline-flex items-center gap-2 rounded-lg bg-success px-4 py-2 text-sm font-medium text-white hover:bg-success/80"
               : "inline-flex items-center gap-2 rounded-lg bg-destructive/15 px-4 py-2 text-sm font-medium text-destructive hover:bg-destructive/25"
           }
         >
-          {status === "Frozen" ? <><Play className="h-4 w-4" /> Reactivate account</> : <><Snowflake className="h-4 w-4" /> Freeze account</>}
+          {status === "Blocked" ? <><Play className="h-4 w-4" /> Unblock account</> : <><Ban className="h-4 w-4" /> Block account</>}
         </button>
       </div>
 
@@ -136,7 +137,7 @@ export default function CustomerDetail() {
           <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Gender</dt><dd className="mt-0.5">{signupProfile.gender}</dd></div>
           <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">City</dt><dd className="mt-0.5">{signupProfile.city}</dd></div>
           <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Signup date</dt><dd className="mt-0.5 font-mono">{signupProfile.joinedAt}</dd></div>
-          <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Status</dt><dd className="mt-1"><StatusBadge status={status} /></dd></div>
+          <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Status</dt><dd className="mt-1"><StatusBadge status={displayStatus} /></dd></div>
           <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Membership plan</dt><dd className="mt-0.5 font-medium">{customer.plan}</dd></div>
           <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Credits</dt><dd className="mt-0.5 font-mono">{customer.credits}</dd></div>
           <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Total bookings</dt><dd className="mt-0.5 font-mono">{customer.bookings}</dd></div>

@@ -2,12 +2,15 @@
 
 import { useCallback, useMemo, useState } from "react";
 import Link from "next/link";
-import { CUSTOMERS } from "@/data/mock";
+import { CUSTOMERS, customerDisplayStatus } from "@/data/mock";
 import { useAccounts } from "@/store/accounts";
 import { Kpi } from "@/components/wp/Kpi";
 import { StatusBadge } from "@/components/wp/StatusBadge";
 import { Search } from "lucide-react";
 import { toast } from "sonner";
+
+const formatLastBooking = (value: string) =>
+  new Date(`${value}T00:00:00`).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
 
 export default function AdminCustomers() {
   const { customerStatus, toggleCustomer } = useAccounts();
@@ -15,25 +18,30 @@ export default function AdminCustomers() {
   const [status, setStatus] = useState("all");
 
   const statusOf = useCallback((email: string, fallback: string) => customerStatus[email] ?? fallback, [customerStatus]);
+  const displayOf = useCallback(
+    (c: (typeof CUSTOMERS)[number]) => customerDisplayStatus(statusOf(c.email, c.status), c.lastBooking),
+    [statusOf],
+  );
 
   const total = CUSTOMERS.length;
-  const active = CUSTOMERS.filter((c) => statusOf(c.email, c.status) === "Active").length;
-  const frozen = CUSTOMERS.filter((c) => statusOf(c.email, c.status) === "Frozen").length;
+  const active = CUSTOMERS.filter((c) => displayOf(c) === "Active").length;
+  const nonActive = CUSTOMERS.filter((c) => displayOf(c) === "Non-active").length;
+  const blocked = CUSTOMERS.filter((c) => displayOf(c) === "Blocked").length;
 
-  const statuses = useMemo(() => Array.from(new Set(CUSTOMERS.map((c) => c.status))).sort(), []);
+  const statuses = ["Active", "Non-active", "Blocked"];
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return CUSTOMERS.filter((c) => {
       const matchesQuery = !q || c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q) || c.plan.toLowerCase().includes(q);
-      const matchesStatus = status === "all" || statusOf(c.email, c.status) === status;
+      const matchesStatus = status === "all" || displayOf(c) === status;
       return matchesQuery && matchesStatus;
     });
-  }, [query, status, statusOf]);
+  }, [query, status, displayOf]);
 
   const onToggle = (email: string, name: string) => {
     const next = toggleCustomer(email);
-    toast.success(`${name} ${next === "Frozen" ? "frozen" : "reactivated"}`);
+    toast.success(`${name} ${next === "Blocked" ? "blocked" : "unblocked"}`);
   };
 
   return (
@@ -68,10 +76,11 @@ export default function AdminCustomers() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Kpi label="Total customers" value={total.toLocaleString()} />
         <Kpi label="Active" value={active} accent="success" />
-        <Kpi label="Frozen" value={frozen} accent="warning" />
+        <Kpi label="Non-active" value={nonActive} accent="warning" />
+        <Kpi label="Blocked" value={blocked} accent="destructive" />
       </div>
 
       <div className="bg-card border border-border rounded-xl overflow-x-auto">
@@ -83,6 +92,7 @@ export default function AdminCustomers() {
               <th className="text-left px-4 py-3">Plan</th>
               <th className="text-left px-4 py-3">Credits</th>
               <th className="text-left px-4 py-3">Bookings</th>
+              <th className="text-left px-4 py-3">Last booking</th>
               <th className="text-left px-4 py-3">Points</th>
               <th className="text-left px-4 py-3">Status</th>
               <th className="text-left px-4 py-3">Actions</th>
@@ -90,7 +100,8 @@ export default function AdminCustomers() {
           </thead>
           <tbody className="divide-y divide-border">
             {filtered.map((c) => {
-              const st = statusOf(c.email, c.status);
+              const account = statusOf(c.email, c.status);
+              const st = customerDisplayStatus(account, c.lastBooking);
               const href = `/admin/customers/${encodeURIComponent(c.email)}`;
               return (
                 <tr key={c.email} className="hover:bg-accent/30">
@@ -101,13 +112,14 @@ export default function AdminCustomers() {
                   <td className="px-4 py-3 text-muted-foreground">{c.plan}</td>
                   <td className="px-4 py-3 font-mono">{c.credits}</td>
                   <td className="px-4 py-3 font-mono">{c.bookings}</td>
+                  <td className="px-4 py-3 text-xs text-muted-foreground">{formatLastBooking(c.lastBooking)}</td>
                   <td className="px-4 py-3 font-mono">{c.points}</td>
                   <td className="px-4 py-3"><StatusBadge status={st} /></td>
                   <td className="px-4 py-3">
                     <div className="flex gap-3">
                       <Link href={href} className="text-xs text-primary hover:text-secondary font-medium">View</Link>
                       <button onClick={() => onToggle(c.email, c.name)} className="text-xs text-muted-foreground hover:text-foreground font-medium">
-                        {st === "Frozen" ? "Reactivate" : "Freeze"}
+                        {account === "Blocked" ? "Unblock" : "Block"}
                       </button>
                     </div>
                   </td>
@@ -116,7 +128,7 @@ export default function AdminCustomers() {
             })}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={8} className="px-4 py-10 text-center text-sm text-muted-foreground">No customers match your filters.</td>
+                <td colSpan={9} className="px-4 py-10 text-center text-sm text-muted-foreground">No customers match your filters.</td>
               </tr>
             )}
           </tbody>

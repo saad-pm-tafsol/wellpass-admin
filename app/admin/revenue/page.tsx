@@ -49,7 +49,8 @@ export default function AdminRevenue() {
   const bookingIndependent = revenueData.reduce((s, m) => s + m.independent, 0);
   const bookingTotal = bookingIndependent;
   const membershipTotal = revenueData.reduce((s, m) => s + m.membership, 0);
-  const totalRevenue = bookingTotal + membershipTotal;
+  const subscriptionTotal = revenueData.reduce((s, m) => s + m.subscription, 0);
+  const totalRevenue = bookingTotal + membershipTotal + subscriptionTotal;
   const pendingTotal = PAYOUTS.filter((p) => p.status === "Pending").reduce((s, p) => s + p.amount, 0);
 
   const membershipShown = MEMBERSHIP_PURCHASES.reduce((s, m) => s + m.amount, 0);
@@ -62,10 +63,11 @@ export default function AdminRevenue() {
         <p className="text-sm text-muted-foreground">Combined platform revenue from membership sales and class bookings</p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <Kpi label="Total revenue" value={compact(totalRevenue)} accent="success" hint="memberships + bookings + partner subscription" />
         <Kpi label="Membership revenue" value={compact(membershipTotal)} accent="primary" hint={`${((membershipTotal / totalRevenue) * 100).toFixed(0)}% of total`} />
         <Kpi label="Booking revenue" value={compact(bookingTotal)} hint={`${((bookingTotal / totalRevenue) * 100).toFixed(0)}% of total`} />
+        <Kpi label="Subscription revenue" value={compact(subscriptionTotal)} accent="primary" hint={`partner subscriptions · ${((subscriptionTotal / totalRevenue) * 100).toFixed(0)}% of total`} />
         <Kpi label="Pending payouts" value={compact(pendingTotal)} accent="warning" />
       </div>
 
@@ -96,7 +98,8 @@ export default function AdminRevenue() {
               <Tooltip />
               <Legend />
               <Bar dataKey="membership" name="Membership" stackId="a" fill="var(--color-chart-3)" />
-              <Bar dataKey="independent" name="Independent bookings" stackId="a" fill="var(--color-secondary)" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="independent" name="Independent bookings" stackId="a" fill="var(--color-secondary)" />
+              <Bar dataKey="subscription" name="Partner subscription" stackId="a" fill="var(--color-chart-4)" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

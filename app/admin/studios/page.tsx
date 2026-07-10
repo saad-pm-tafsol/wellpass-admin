@@ -33,7 +33,7 @@ export default function AdminStudios() {
 
   const onToggle = (id: string, name: string) => {
     const next = toggleStudio(id);
-    toast.success(`${name} ${next === "Frozen" ? "frozen" : "reactivated"}`);
+    toast.success(`${name} ${next === "Blocked" ? "blocked" : "unblocked"}`);
   };
 
   const onApprove = (id: string) => {
@@ -169,7 +169,7 @@ export default function AdminStudios() {
                     <div className="flex gap-3">
                       <Link href={`/admin/studios/${s.id}`} className="text-xs text-primary hover:text-secondary font-medium">View</Link>
                       <button onClick={() => onToggle(s.id, s.name)} className="text-xs text-muted-foreground hover:text-foreground font-medium">
-                        {status === "Frozen" ? "Reactivate" : "Freeze"}
+                        {status === "Blocked" ? "Unblock" : "Block"}
                       </button>
                     </div>
                   </td>

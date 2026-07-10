@@ -63,7 +63,7 @@ export function ApplicationDetailsCard({ partner, status }: { partner: Applicati
         <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Owner</dt><dd className="mt-0.5 font-medium">{partner.owner}</dd></div>
         <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Email</dt><dd className="mt-0.5 break-all">{partner.email}</dd></div>
         <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Phone</dt><dd className="mt-0.5 font-mono">{partner.phone}</dd></div>
-        <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Commercial number</dt><dd className="mt-0.5 font-mono break-all">{commercialNumber}</dd></div>
+        <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Commercial number / Financial license</dt><dd className="mt-0.5 font-mono break-all">{commercialNumber}</dd></div>
         <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Category</dt><dd className="mt-0.5">{partner.category}</dd></div>
         <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Location</dt><dd className="mt-0.5">{partner.location}</dd></div>
         <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Submitted</dt><dd className="mt-0.5">{partner.submittedAt}</dd></div>
