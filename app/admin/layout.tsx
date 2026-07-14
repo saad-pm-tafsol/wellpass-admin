@@ -2,13 +2,14 @@
 
 import { usePathname } from "next/navigation";
 import { SidebarLayout } from "@/components/wp/SidebarLayout";
-import { LayoutDashboard, Building2, Users, ClipboardList, Coins, ArrowLeftRight, Tags, Gift, Wallet, TrendingUp, Banknote, Percent, ScrollText, HelpCircle, Bell, Settings as SettingsIcon } from "lucide-react";
+import { LayoutDashboard, Building2, Users, ClipboardList, Coins, ArrowLeftRight, Tags, Gift, Wallet, TrendingUp, Banknote, Percent, ScrollText, HelpCircle, Bell, Settings as SettingsIcon, Undo2 } from "lucide-react";
 
 const nav = [
   { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/admin/studios", label: "Partners", icon: Building2 },
   { to: "/admin/customers", label: "Customers", icon: Users },
   { to: "/admin/bookings", label: "Bookings", icon: ClipboardList },
+  { to: "/admin/refunds", label: "Refunds", icon: Undo2 },
   { to: "/admin/membership-plans", label: "Membership Plans", icon: Coins },
   { to: "/admin/credit-rate", label: "Credit Rate", icon: ArrowLeftRight },
   { to: "/admin/categories", label: "Categories", icon: Tags },
@@ -28,6 +29,7 @@ const titles: Record<string, string> = {
   "/admin/studios": "Partner Management",
   "/admin/customers": "Customer Management",
   "/admin/bookings": "Booking Administration",
+  "/admin/refunds": "Refunds",
   "/admin/membership-plans": "Membership Plans",
   "/admin/credit-rate": "Credit Conversion",
   "/admin/categories": "Categories",

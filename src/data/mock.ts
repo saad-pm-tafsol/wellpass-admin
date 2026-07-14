@@ -164,6 +164,7 @@ export const BOOKINGS: Booking[] = [
   { ref: "WP-2025-04815", customer: "Ahmed Al-Rashidi", classId: "c3", status: "Completed", type: "Credit", credits: 10, createdAt: "2025-06-26 18:00" },
   { ref: "WP-2025-04814", customer: "Fatima Al-Dosari", classId: "c7", status: "Cancelled", type: "Credit", credits: 6, createdAt: "2025-06-25 08:00", cancelledBy: "Customer", cancellationReason: "Schedule changed and I can no longer attend." },
   { ref: "WP-2025-04813", customer: "Khalid Al-Shehri", classId: "c4", status: "Rejected", type: "Independent", amount: 100, createdAt: "2025-06-25 11:20" },
+  { ref: "WP-2025-04812", customer: "Noura Al-Otaibi", classId: "c3", status: "No-Show", type: "Credit", credits: 10, createdAt: "2025-06-24 18:00" },
 ];
 
 export type ClassDeletionRecord = {
@@ -287,23 +288,41 @@ export function classById(id: string) {
   return CLASSES.find((c) => c.id === id);
 }
 
-// Revenue by source: independent bookings + membership package sales + partner
-// subscription fees (studios paying to be listed on the platform).
+// Revenue by source, split by who it comes from:
+//  · Customer side  — membership package sales + independent (pay-per-class) bookings.
+//  · Partner side    — subscription/listing fees (studios paying to be listed) +
+//                      first-booking commission + default ongoing-booking commission
+//                      (the platform's cut on partner bookings). See data/settings.ts
+//                      for the commission rates, mirrored on the partner site's
+//                      studio/revenue page.
+// `refunds` = money/credits returned to customers from cancellations in the
+// period (an expense on the P&L). See app/admin/refunds for the live refund log.
 export const REVENUE_WEEKLY = [
-  { week: "W1", membership: 2400, independent: 1200, subscription: 600 }, { week: "W2", membership: 2600, independent: 1400, subscription: 650 },
-  { week: "W3", membership: 2800, independent: 1500, subscription: 700 }, { week: "W4", membership: 3000, independent: 1600, subscription: 750 },
+  { week: "W1", membership: 2400, independent: 1200, subscription: 600, firstBookingCommission: 300, ongoingCommission: 280, refunds: 60 },
+  { week: "W2", membership: 2600, independent: 1400, subscription: 650, firstBookingCommission: 330, ongoingCommission: 310, refunds: 70 },
+  { week: "W3", membership: 2800, independent: 1500, subscription: 700, firstBookingCommission: 360, ongoingCommission: 340, refunds: 80 },
+  { week: "W4", membership: 3000, independent: 1600, subscription: 750, firstBookingCommission: 390, ongoingCommission: 370, refunds: 90 },
 ];
 export const REVENUE_MONTHLY = [
-  { month: "Jan", membership: 2400, independent: 1800, subscription: 1800 }, { month: "Feb", membership: 2700, independent: 2100, subscription: 1950 },
-  { month: "Mar", membership: 3000, independent: 2400, subscription: 2100 }, { month: "Apr", membership: 3400, independent: 2700, subscription: 2300 },
-  { month: "May", membership: 3800, independent: 3100, subscription: 2500 }, { month: "Jun", membership: 4200, independent: 3500, subscription: 2700 },
-  { month: "Jul", membership: 4600, independent: 3900, subscription: 2900 }, { month: "Aug", membership: 5000, independent: 4300, subscription: 3100 },
-  { month: "Sep", membership: 5400, independent: 4700, subscription: 3300 }, { month: "Oct", membership: 5800, independent: 5100, subscription: 3600 },
-  { month: "Nov", membership: 6200, independent: 5500, subscription: 3900 }, { month: "Dec", membership: 6600, independent: 5900, subscription: 4200 },
+  { month: "Jan", membership: 2400, independent: 1800, subscription: 1800, firstBookingCommission: 600, ongoingCommission: 550, refunds: 120 },
+  { month: "Feb", membership: 2700, independent: 2100, subscription: 1950, firstBookingCommission: 700, ongoingCommission: 680, refunds: 140 },
+  { month: "Mar", membership: 3000, independent: 2400, subscription: 2100, firstBookingCommission: 800, ongoingCommission: 760, refunds: 160 },
+  { month: "Apr", membership: 3400, independent: 2700, subscription: 2300, firstBookingCommission: 900, ongoingCommission: 880, refunds: 180 },
+  { month: "May", membership: 3800, independent: 3100, subscription: 2500, firstBookingCommission: 1000, ongoingCommission: 980, refunds: 200 },
+  { month: "Jun", membership: 4200, independent: 3500, subscription: 2700, firstBookingCommission: 1100, ongoingCommission: 1080, refunds: 220 },
+  { month: "Jul", membership: 4600, independent: 3900, subscription: 2900, firstBookingCommission: 1200, ongoingCommission: 1180, refunds: 240 },
+  { month: "Aug", membership: 5000, independent: 4300, subscription: 3100, firstBookingCommission: 1300, ongoingCommission: 1280, refunds: 260 },
+  { month: "Sep", membership: 5400, independent: 4700, subscription: 3300, firstBookingCommission: 1400, ongoingCommission: 1380, refunds: 280 },
+  { month: "Oct", membership: 5800, independent: 5100, subscription: 3600, firstBookingCommission: 1500, ongoingCommission: 1480, refunds: 300 },
+  { month: "Nov", membership: 6200, independent: 5500, subscription: 3900, firstBookingCommission: 1600, ongoingCommission: 1580, refunds: 320 },
+  { month: "Dec", membership: 6600, independent: 5900, subscription: 4200, firstBookingCommission: 1700, ongoingCommission: 1680, refunds: 340 },
 ];
 export const REVENUE_YEARLY = [
-  { year: "2021", membership: 28000, independent: 21000, subscription: 18000 }, { year: "2022", membership: 32000, independent: 24000, subscription: 21000 },
-  { year: "2023", membership: 36000, independent: 27000, subscription: 24000 }, { year: "2024", membership: 40000, independent: 30000, subscription: 28000 }, { year: "2025", membership: 44000, independent: 33000, subscription: 32000 },
+  { year: "2021", membership: 28000, independent: 21000, subscription: 18000, firstBookingCommission: 14000, ongoingCommission: 13000, refunds: 1500 },
+  { year: "2022", membership: 32000, independent: 24000, subscription: 21000, firstBookingCommission: 17000, ongoingCommission: 16000, refunds: 1700 },
+  { year: "2023", membership: 36000, independent: 27000, subscription: 24000, firstBookingCommission: 19000, ongoingCommission: 19000, refunds: 1900 },
+  { year: "2024", membership: 40000, independent: 30000, subscription: 28000, firstBookingCommission: 22000, ongoingCommission: 22000, refunds: 2100 },
+  { year: "2025", membership: 44000, independent: 33000, subscription: 32000, firstBookingCommission: 24000, ongoingCommission: 23000, refunds: 2300 },
 ];
 export const REGISTRATION_TRENDS = {
   weekly: [

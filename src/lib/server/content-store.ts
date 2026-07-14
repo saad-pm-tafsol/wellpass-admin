@@ -23,11 +23,13 @@ import {
   type LoyaltyEarningRule,
 } from "@/lib/loyalty-rules";
 import { normalizePlanValidity, type PlanValidityMap } from "@/lib/membership-plans";
+import { normalizeRefundRequests, type RefundRequest } from "@/lib/refunds";
 
 export type ContentState = {
   faqs: Faq[];
   loyaltyRules: LoyaltyEarningRule[];
   planValidity: PlanValidityMap;
+  refundRequests: RefundRequest[];
 };
 
 // Shared with the customer site. Override with WELLPASS_CONTENT_FILE in both
@@ -41,6 +43,7 @@ function withDefaults(value: unknown): ContentState {
     faqs: normalizeFaqs(v.faqs) ?? DEFAULT_FAQS,
     loyaltyRules: normalizeLoyaltyEarningRules(v.loyaltyRules) ?? DEFAULT_LOYALTY_EARNING_RULES,
     planValidity: normalizePlanValidity(v.planValidity),
+    refundRequests: normalizeRefundRequests(v.refundRequests),
   };
 }
 

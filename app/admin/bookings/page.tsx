@@ -13,6 +13,7 @@ const STATS = {
   pending: BOOKINGS.filter((b) => b.status === "Pending").length,
   confirmed: BOOKINGS.filter((b) => b.status === "Confirmed").length,
   cancelled: BOOKINGS.filter((b) => b.status === "Cancelled").length,
+  noShow: BOOKINGS.filter((b) => b.status === "No-Show").length,
 };
 
 export default function AdminBookings() {
@@ -95,11 +96,12 @@ export default function AdminBookings() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <Kpi label="Total bookings" value={STATS.total} />
         <Kpi label="Pending approval" value={STATS.pending} accent="warning" />
         <Kpi label="Confirmed" value={STATS.confirmed} accent="success" />
         <Kpi label="Cancelled" value={STATS.cancelled} accent="destructive" />
+        <Kpi label="No-shows" value={STATS.noShow} accent="destructive" />
       </div>
 
       <div className="bg-card border border-border rounded-xl overflow-x-auto">
@@ -176,7 +178,6 @@ export default function AdminBookings() {
                 <dd className="mt-0.5 font-mono">{selected.booking.type === "Credit" ? `${selected.booking.credits ?? 0} credits` : `SAR ${(selected.booking.amount ?? 0).toFixed(0)}`}</dd>
               </div>
               <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Value (SAR)</dt><dd className="mt-0.5 font-mono">SAR {selected.sar.toFixed(2)}</dd></div>
-              <div><dt className="text-xs uppercase tracking-wider text-muted-foreground">Platform commission</dt><dd className="mt-0.5 font-mono text-success-foreground">{selected.commission > 0 ? `+SAR ${selected.commission.toFixed(2)}` : "—"}</dd></div>
             </dl>
           </div>
         )}

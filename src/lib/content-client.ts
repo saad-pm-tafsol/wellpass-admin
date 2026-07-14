@@ -16,17 +16,24 @@ import {
   normalizePlanValidity,
   type PlanValidityMap,
 } from "@/lib/membership-plans";
+import {
+  DEFAULT_REFUND_REQUESTS,
+  normalizeRefundRequests,
+  type RefundRequest,
+} from "@/lib/refunds";
 
 export type ContentState = {
   faqs: Faq[];
   loyaltyRules: LoyaltyEarningRule[];
   planValidity: PlanValidityMap;
+  refundRequests: RefundRequest[];
 };
 
 export const DEFAULT_CONTENT: ContentState = {
   faqs: DEFAULT_FAQS,
   loyaltyRules: DEFAULT_LOYALTY_EARNING_RULES,
   planValidity: {},
+  refundRequests: DEFAULT_REFUND_REQUESTS,
 };
 
 // Empty string => same-origin relative request. Swap for the backend origin
@@ -40,6 +47,7 @@ function normalizeContent(value: unknown): ContentState {
     faqs: normalizeFaqs(v.faqs),
     loyaltyRules: normalizeLoyaltyEarningRules(v.loyaltyRules),
     planValidity: normalizePlanValidity(v.planValidity),
+    refundRequests: normalizeRefundRequests(v.refundRequests),
   };
 }
 
@@ -76,3 +84,8 @@ export const fetchPlanValidity = async (): Promise<PlanValidityMap> =>
   (await getContent()).planValidity;
 export const savePlanValidity = (planValidity: PlanValidityMap) =>
   saveContent({ planValidity });
+
+export const fetchRefundRequests = async (): Promise<RefundRequest[]> =>
+  (await getContent()).refundRequests;
+export const saveRefundRequests = (refundRequests: RefundRequest[]) =>
+  saveContent({ refundRequests });

@@ -50,7 +50,11 @@ export default function AdminRevenue() {
   const bookingTotal = bookingIndependent;
   const membershipTotal = revenueData.reduce((s, m) => s + m.membership, 0);
   const subscriptionTotal = revenueData.reduce((s, m) => s + m.subscription, 0);
-  const totalRevenue = bookingTotal + membershipTotal + subscriptionTotal;
+  // Partner commissions: platform's cut on first + ongoing bookings.
+  const commissionTotal = revenueData.reduce((s, m) => s + m.firstBookingCommission + m.ongoingCommission, 0);
+  const customerRevenue = bookingTotal + membershipTotal;
+  const partnerRevenue = subscriptionTotal + commissionTotal;
+  const totalRevenue = customerRevenue + partnerRevenue;
   const pendingTotal = PAYOUTS.filter((p) => p.status === "Pending").reduce((s, p) => s + p.amount, 0);
 
   const membershipShown = MEMBERSHIP_PURCHASES.reduce((s, m) => s + m.amount, 0);
@@ -60,14 +64,17 @@ export default function AdminRevenue() {
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-bold tracking-tight">Revenue</h2>
-        <p className="text-sm text-muted-foreground">Combined platform revenue from membership sales and class bookings</p>
+        <p className="text-sm text-muted-foreground">Combined platform revenue from customer payments and partner subscriptions &amp; commissions</p>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
-        <Kpi label="Total revenue" value={compact(totalRevenue)} accent="success" hint="memberships + bookings + partner subscription" />
-        <Kpi label="Membership revenue" value={compact(membershipTotal)} accent="primary" hint={`${((membershipTotal / totalRevenue) * 100).toFixed(0)}% of total`} />
-        <Kpi label="Booking revenue" value={compact(bookingTotal)} hint={`${((bookingTotal / totalRevenue) * 100).toFixed(0)}% of total`} />
-        <Kpi label="Subscription revenue" value={compact(subscriptionTotal)} accent="primary" hint={`partner subscriptions · ${((subscriptionTotal / totalRevenue) * 100).toFixed(0)}% of total`} />
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+        <Kpi label="Total revenue" value={compact(totalRevenue)} accent="success" hint="customer + partner revenue" />
+        <Kpi label="Customer revenue" value={compact(customerRevenue)} hint={`memberships + bookings · ${((customerRevenue / totalRevenue) * 100).toFixed(0)}% of total`} />
+        <Kpi label="Partner revenue" value={compact(partnerRevenue)} accent="primary" hint={`subscription + commission · ${((partnerRevenue / totalRevenue) * 100).toFixed(0)}% of total`} />
+        <Kpi label="Membership revenue" value={compact(membershipTotal)} hint={`${((membershipTotal / totalRevenue) * 100).toFixed(0)}% of total`} />
+        <Kpi label="Independent bookings" value={compact(bookingTotal)} hint={`${((bookingTotal / totalRevenue) * 100).toFixed(0)}% of total`} />
+        <Kpi label="Subscription revenue" value={compact(subscriptionTotal)} accent="primary" hint="partner listing fees" />
+        <Kpi label="Commission revenue" value={compact(commissionTotal)} accent="primary" hint="first-booking + ongoing" />
         <Kpi label="Pending payouts" value={compact(pendingTotal)} accent="warning" />
       </div>
 
@@ -99,7 +106,9 @@ export default function AdminRevenue() {
               <Legend />
               <Bar dataKey="membership" name="Membership" stackId="a" fill="var(--color-chart-3)" />
               <Bar dataKey="independent" name="Independent bookings" stackId="a" fill="var(--color-secondary)" />
-              <Bar dataKey="subscription" name="Partner subscription" stackId="a" fill="var(--color-chart-4)" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="subscription" name="Partner subscription" stackId="a" fill="var(--color-chart-4)" />
+              <Bar dataKey="firstBookingCommission" name="First-booking commission" stackId="a" fill="var(--color-chart-1)" />
+              <Bar dataKey="ongoingCommission" name="Ongoing commission" stackId="a" fill="var(--color-chart-5)" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
